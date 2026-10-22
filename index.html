@@ -41,23 +41,23 @@ button{font:inherit;cursor:pointer;color:var(--paper);touch-action:manipulation}
 .mainBtn{margin-top:13px;padding:15px 25px;background:#801a2a;border:1px solid #cb4253;letter-spacing:2px;font-weight:bold;min-height:48px}
 .mainBtn:hover{background:#a92034}
 .hidden{display:none!important}
-.mobile{display:none;position:absolute;z-index:8;left:13px;right:13px;bottom:max(16px,env(safe-area-inset-bottom));justify-content:space-between;align-items:flex-end;pointer-events:none}
+.mobile{display:flex;position:absolute;z-index:8;left:50%;right:auto;bottom:18px;transform:translateX(-50%);gap:22px;justify-content:center;align-items:flex-end;pointer-events:none}
 .pad{display:grid;grid-template-columns:repeat(3,43px);grid-template-rows:repeat(2,39px);gap:4px;pointer-events:auto}
 .pad button,.actions button{background:#101214c9;border:1px solid #a9a39b72;touch-action:none;padding:0;user-select:none;-webkit-user-select:none}
 .pad .up{grid-column:2}.pad .left{grid-column:1;grid-row:2}.pad .down{grid-column:2;grid-row:2}.pad .right{grid-column:3;grid-row:2}
 .actions{display:flex;align-items:flex-end;gap:7px;pointer-events:auto}
 .actions button{width:52px;height:52px;border-radius:50%;font-size:9px;letter-spacing:0;background:#101214d9}
 .flash{position:absolute;inset:0;z-index:9;background:#f5eee7;opacity:0;pointer-events:none}
-@media(max-width:700px){#game{width:100vw;height:100dvh}.hud{padding:13px}.brand,.clock{font-size:9px}.goal{font-size:10px;max-width:72%;line-height:1.6}.meter{width:86px}.hints{display:none}.mobile{display:flex}.prompt{bottom:25%;font-size:10px}.radio{top:13%;font-size:11px}.voice{top:53px;right:12px}.panel{padding:25px 18px}.title{letter-spacing:-2px}.panel p{font-size:11px}.mainBtn{width:100%}}
+@media(max-width:700px){#game{width:100vw;height:100dvh}.mobile{left:13px;right:13px;bottom:max(16px,env(safe-area-inset-bottom));transform:none;justify-content:space-between;gap:8px}.hud{padding:13px}.brand,.clock{font-size:9px}.goal{font-size:10px;max-width:72%;line-height:1.6}.meter{width:86px}.hints{display:none}.mobile{display:flex}.prompt{bottom:25%;font-size:10px}.radio{top:13%;font-size:11px}.voice{top:53px;right:12px}.panel{padding:25px 18px}.title{letter-spacing:-2px}.panel p{font-size:11px}.mainBtn{width:100%}}
 @media(max-height:550px) and (orientation:landscape){.mobile{bottom:8px}.pad{grid-template-rows:repeat(2,31px);grid-template-columns:repeat(3,37px)}.actions button{width:43px;height:43px}.panel{padding:16px 22px}.kicker{margin-bottom:8px}.title{font-size:43px;margin-bottom:12px}.panel p{margin:7px 0}.keys{margin:9px 0}.mainBtn{margin-top:4px}}
 </style>
 </head>
 <body>
 <div id="game">
-<canvas id="view" width="960" height="600" aria-label="Игровой экран"></canvas>
+<canvas id="view" width="960" height="600" aria-label="Игровой экран" tabindex="0"></canvas>
 <div class="vignette"></div><div class="scanlines"></div>
 <div class="hud" id="hud">
-  <div class="hudTop"><div class="brand">ОБЪЕКТ <strong>09</strong> / СЕКТОР Б</div><div class="clock" id="clock">03:17 AM<br><span style="color:#777">КАМЕРЫ: НЕТ СИГНАЛА</span></div></div>
+  <div class="hudTop"><div class="brand">ОБЪЕКТ <strong>09</strong> / СЕКТОР Б <span id="controlStatus" style="display:inline-block;margin-left:10px;color:#7fbd91">· ГОТОВ</span></div><div class="clock" id="clock">03:17 AM<br><span style="color:#777">КАМЕРЫ: НЕТ СИГНАЛА</span></div></div>
   <div class="hudBottom"><div><div class="goal" id="goal">НАЙДИ ТРИ ПРЕДОХРАНИТЕЛЯ. НЕ ДОВЕРЯЙ РАДИО.</div><div class="meta">ФОНАРЬ <span id="charge">100%</span><div class="meter"><span id="bar"></span></div></div></div><div class="hints">W / S — ВПЕРЁД / НАЗАД<br>A / D — ШАГ ВБОК<br>← / → или Q / R — ПОВОРОТ<br>SHIFT — БЕГ · F — ФОНАРЬ<br>E — ВЗАИМОДЕЙСТВИЕ</div></div>
 </div>
 <div class="reticle" id="reticle"></div>
@@ -199,9 +199,9 @@ function showEnding(win){
  if(win)dialogue('НЕИЗВЕСТНЫЙ ГОЛОС','Теперь моя очередь.',true)
 }
 function startGame(){
- setupWorld();active=true;lightOn=true;battery=100;elapsed=0;noise=0;panic=0;storyStep=0;collected=0;lastThreat=0;keys=Object.create(null);
+ try{setupWorld()}catch(err){console.error('World setup failed:',err);dialogue('СИСТЕМА','Не удалось собрать уровень. Нажми перезапуск.',false);return}active=true;lightOn=true;battery=100;elapsed=0;noise=0;panic=0;storyStep=0;collected=0;lastThreat=0;keys=Object.create(null);
  $('intro').classList.add('hidden');$('ending').classList.add('hidden');$('hud').classList.remove('hidden');$('mobile').classList.remove('hidden');$('reticle').classList.remove('hidden');$('voiceToggle').classList.remove('hidden');
- $('goal').textContent='НАЙДИ ТРИ ПРЕДОХРАНИТЕЛЯ. НЕ ДОВЕРЯЙ РАДИО.';$('radio').style.opacity=0;$('charge').textContent='100%';$('bar').style.width='100%';$('prompt').textContent='ОБЫЩИ КОРИДОРЫ';$('clock').innerHTML='03:17 AM<br><span style="color:#777">КАМЕРЫ: НЕТ СИГНАЛА</span>';
+ $('goal').textContent='НАЙДИ ТРИ ПРЕДОХРАНИТЕЛЯ. НЕ ДОВЕРЯЙ РАДИО.';setControlStatus('ИГРА ЗАПУЩЕНА');$('radio').style.opacity=0;$('charge').textContent='100%';$('bar').style.width='100%';$('prompt').textContent='ОБЫЩИ КОРИДОРЫ';$('clock').innerHTML='03:17 AM<br><span style="color:#777">КАМЕРЫ: НЕТ СИГНАЛА</span>';
  $('flash').style.opacity=0;$('msg').style.opacity=0;lastFrame=performance.now();drawWorld();dialogue('ДИСПЕТЧЕР','Слышишь меня? Найди три предохранителя. И не оборачивайся, если услышишь шаги за спиной.',true)
 }
 function interact(){
@@ -254,18 +254,46 @@ function actionForKey(k){
  if(k==='arrowleft'||k==='q')return 'turnL';if(k==='arrowright'||k==='r')return 'turnR';
  if(k==='shift')return 'run';return null
 }
-window.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();const action=actionForKey(k);if(action)keys[action]=true;if(!e.repeat&&k==='e')interact();if(!e.repeat&&k==='f'&&active&&battery>0)lightOn=!lightOn});
-window.addEventListener('keyup',e=>{const k=e.key.toLowerCase(),action=actionForKey(k);if(action)delete keys[action]});
-window.addEventListener('blur',()=>{keys=Object.create(null)});
-document.querySelectorAll('[data-control]').forEach(btn=>{const act=btn.dataset.control;const down=e=>{e.preventDefault();keys[act]=true};const up=e=>{e.preventDefault();delete keys[act]};btn.addEventListener('pointerdown',down);['pointerup','pointerleave','pointercancel'].forEach(ev=>btn.addEventListener(ev,up))});
-$('touchE').addEventListener('click',interact);$('touchLight').addEventListener('click',()=>{if(active&&battery>0)lightOn=!lightOn});
+function setControlStatus(label){const el=$('controlStatus');if(el)el.textContent='· '+label}
+function handleKeyDown(e){
+ const k=String(e.key||'').toLowerCase();
+ if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();
+ const action=actionForKey(k);
+ if(action){keys[action]=true;if(active)setControlStatus('КНОПКА: '+k.toUpperCase())}
+ if(!e.repeat&&k==='e'){interact();if(active)setControlStatus('ДЕЙСТВИЕ')}
+ if(!e.repeat&&k==='f'&&active&&battery>0){lightOn=!lightOn;setControlStatus(lightOn?'ФОНАРЬ ВКЛ':'ФОНАРЬ ВЫКЛ')}
+}
+function handleKeyUp(e){const k=String(e.key||'').toLowerCase(),action=actionForKey(k);if(action)delete keys[action]}
+window.addEventListener('keydown',handleKeyDown,{passive:false});
+document.addEventListener('keydown',handleKeyDown,{passive:false});
+window.addEventListener('keyup',handleKeyUp);
+document.addEventListener('keyup',handleKeyUp);
+window.addEventListener('blur',()=>{keys=Object.create(null)});window.addEventListener('pointerup',()=>{for(const k of ['forward','back','strafeL','strafeR','turnL','turnR','run'])delete keys[k]});
+document.querySelectorAll('[data-control]').forEach(btn=>{
+ const act=btn.dataset.control;
+ let pulseTimer=null;
+ const down=e=>{e.preventDefault();keys[act]=true;btn.dataset.pressed='1';if(active)setControlStatus('УПРАВЛЕНИЕ АКТИВНО')};
+ const up=e=>{if(e)e.preventDefault();delete keys[act];delete btn.dataset.pressed};
+ btn.addEventListener('pointerdown',down);
+ ['pointerup','pointerleave','pointercancel','lostpointercapture'].forEach(ev=>btn.addEventListener(ev,up));
+ // A quick tap still produces a visible movement/turn, even if the finger or mouse is released immediately.
+ btn.addEventListener('click',e=>{
+  e.preventDefault();
+  if(pulseTimer)clearTimeout(pulseTimer);
+  keys[act]=true;
+  if(active)setControlStatus('КНОПКА: '+act.toUpperCase());
+  pulseTimer=setTimeout(()=>{delete keys[act];pulseTimer=null},220);
+ });
+});
+$('touchE').addEventListener('click',()=>{interact();if(active)setControlStatus('ДЕЙСТВИЕ')});
+$('touchLight').addEventListener('click',()=>{if(active&&battery>0){lightOn=!lightOn;setControlStatus(lightOn?'ФОНАРЬ ВКЛ':'ФОНАРЬ ВЫКЛ')}});
 $('start').addEventListener('click',startGame);$('restart').addEventListener('click',startGame);
 $('voiceToggle').addEventListener('click',()=>{voiceOn=!voiceOn;$('voiceToggle').textContent='ГОЛОС: '+(voiceOn?'ВКЛ':'ВЫКЛ');if(!voiceOn&&'speechSynthesis'in window)window.speechSynthesis.cancel();else if(active)dialogue('СИСТЕМА','Голосовые сообщения включены.',true)});
 let dragX=null;
 canvas.addEventListener('pointerdown',e=>{if(!active)return;dragX=e.clientX;if(canvas.setPointerCapture)canvas.setPointerCapture(e.pointerId)});
 canvas.addEventListener('pointermove',e=>{if(!active)return;if(document.pointerLockElement===canvas){player.a=normAngle(player.a+e.movementX*.0038)}else if(dragX!==null){player.a=normAngle(player.a+(e.clientX-dragX)*.006);dragX=e.clientX}});
 ['pointerup','pointercancel','pointerleave'].forEach(ev=>canvas.addEventListener(ev,()=>dragX=null));
-canvas.addEventListener('click',()=>{if(active&&window.matchMedia('(hover:hover)').matches&&canvas.requestPointerLock){try{canvas.requestPointerLock()}catch(e){}}});
+canvas.addEventListener('click',()=>{if(active){try{canvas.focus({preventScroll:true})}catch(e){canvas.focus()}}});
 setupWorld();drawWorld();lastFrame=performance.now();requestAnimationFrame(loop);
 })();
 </script>
