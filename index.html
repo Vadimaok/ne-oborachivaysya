@@ -129,6 +129,97 @@ function bind(){
 try{if(!window.THREE)throw new Error('Не загрузился Three.js. Проверь подключение к интернету и обнови страницу.');createWorld();bind();$('loadStatus').textContent='3D-город готов · WASD — управление';}catch(e){$('loadStatus').textContent='Ошибка запуска: '+e.message;say(e.message);console.error(e)}
 })();
 }
+
+function startFallbackGame(){
+ const start=document.getElementById('start'), status=document.getElementById('loadStatus');
+ const oldHud=document.getElementById('hud'); if(oldHud)oldHud.style.display='none';
+ const game=document.getElementById('game');
+ game.innerHTML='<canvas id="fallbackCanvas" style="position:fixed;inset:0;width:100%;height:100%;display:block"></canvas>';
+ const canvas=document.getElementById('fallbackCanvas'),ctx=canvas.getContext('2d');
+ if(!ctx){if(status)status.textContent='Браузер не поддерживает графику Canvas.';return}
+ let w=innerWidth,h=innerHeight,dpr=1,playing=false,carMode=false,money=2500,mission=false,toast='Добро пожаловать в NEON CITY!',toastUntil=performance.now()+3000,last=0;
+ const keys={},player={x:0,y:0,a:0,speed:0},cars=[],people=[],buildings=[];
+ const rnd=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+ for(let i=-7;i<=7;i++)for(let j=-7;j<=7;j++){
+  if(i%2===0||j%2===0)continue;
+  buildings.push({x:i*150+rnd(-15,15),y:j*150+rnd(-15,15),w:rnd(62,100),h:rnd(62,100),c:['#172a40','#202c3c','#30273e','#173b42'][Math.floor(rnd(0,4))],lit:Math.floor(rnd(3,10))});
+ }
+ for(let i=0;i<24;i++)cars.push({x:rnd(-950,950),y:rnd(-950,950),a:rnd(0,6.28),color:['#f04d83','#29d6cf','#eab85d','#dbe6f2','#8d83ff'][i%5],owned:false});
+ for(let i=0;i<34;i++)people.push({x:rnd(-950,950),y:rnd(-950,950),a:rnd(0,6.28),color:['#f4b7d3','#82e8df','#f2d28b'][i%3]});
+ function resize(){dpr=Math.min(devicePixelRatio||1,2);w=innerWidth;h=innerHeight;canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
+ addEventListener('resize',resize);resize();
+ function say(s){toast=s;toastUntil=performance.now()+2400}
+ function start(){playing=true;start.style.display='none';say('Город открыт! WASD — движение, E — машина');requestAnimationFrame(frame)}
+ const startBtn=document.getElementById('startBtn');if(startBtn)startBtn.onclick=start;
+ if(status)status.textContent='Резервный режим готов — можно войти в город';
+ function down(e){if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();keys[e.code]=true;if(e.repeat)return;
+  if(e.code==='KeyE'){let near=null,dist=55;for(const c of cars){const d=Math.hypot(c.x-player.x,c.y-player.y);if(d<dist){dist=d;near=c}}if(carMode){carMode=false;player.x+=Math.cos(player.a+1)*28;player.y+=Math.sin(player.a+1)*28;say('Ты вышел из машины')}else if(near){carMode=true;player.x=near.x;player.y=near.y;player.a=near.a;near.owned=true;say('Машина твоя! Жми W, чтобы ехать')}else say('Подойди ближе к машине и нажми E')}
+  if(e.code==='KeyF')say('БИ-БИП! Город слышит тебя');
+  if(e.code==='KeyM')say('Районы: Центр · Неоновые доки · Старый город');
+  if(e.code==='Escape')say('Продолжай исследовать город!');
+ }
+ function up(e){keys[e.code]=false}
+ addEventListener('keydown',down);addEventListener('keyup',up);addEventListener('blur',()=>Object.keys(keys).forEach(k=>keys[k]=false));
+ function roundRect(x,y,ww,hh,r){ctx.beginPath();ctx.roundRect(x,y,ww,hh,r);ctx.fill()}
+ function frame(t){if(!playing)return;requestAnimationFrame(frame);const dt=Math.min((t-last)/1000||0,.035);last=t;
+  const throttle=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),steer=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0);
+  if(carMode){player.a+=steer*dt*(keys.ShiftLeft?2.8:2.15);player.speed+=(throttle*26-player.speed*1.15)*dt;if(keys.ShiftLeft||keys.ShiftRight)player.speed=clamp(player.speed,-22,55);else player.speed=clamp(player.speed,-18,34);player.x+=Math.sin(player.a)*player.speed*dt;player.y+=Math.cos(player.a)*player.speed*dt;const c=cars.find(x=>x.owned);if(c){c.x=player.x;c.y=player.y;c.a=player.a}}
+  else{player.a+=steer*dt*2.5;const speed=throttle*(keys.ShiftLeft||keys.ShiftRight?190:115);player.x+=Math.sin(player.a)*speed*dt;player.y+=Math.cos(player.a)*speed*dt}
+  const scale=Math.min(w,h)/780,camX=player.x,camY=player.y;
+  ctx.fillStyle='#080e19';ctx.fillRect(0,0,w,h);
+  ctx.save();ctx.translate(w/2-camX*scale,h/2-camY*scale);ctx.scale(scale,scale);
+  // Endless-feeling city grid and glowing road lanes
+  const extent=1100,step=150;
+  for(let i=Math.floor((camX-extent)/step);i<=Math.ceil((camX+extent)/step);i++){
+   ctx.fillStyle='#1c2634';ctx.fillRect(i*step-31,camY-extent,62,extent*2);ctx.fillRect(camX-extent,i*step-31,extent*2,62);
+   ctx.strokeStyle='#536171';ctx.lineWidth=1.5;ctx.setLineDash([13,15]);ctx.beginPath();ctx.moveTo(i*step,camY-extent);ctx.lineTo(i*step,camY+extent);ctx.moveTo(camX-extent,i*step);ctx.lineTo(camX+extent,i*step);ctx.stroke();ctx.setLineDash([]);
+  }
+  for(const b of buildings){if(Math.abs(b.x-camX)>extent||Math.abs(b.y-camY)>extent)continue;
+   ctx.fillStyle='#070b12';ctx.fillRect(b.x-b.w/2+8,b.y-b.h/2+12,b.w,b.h);
+   ctx.fillStyle=b.c;ctx.fillRect(b.x-b.w/2,b.y-b.h/2,b.w,b.h);
+   ctx.strokeStyle='#3b5a70';ctx.lineWidth=2;ctx.strokeRect(b.x-b.w/2,b.y-b.h/2,b.w,b.h);
+   for(let n=0;n<b.lit;n++){const wx=b.x-b.w/2+12+(n%(Math.max(1,Math.floor(b.w/19))))*19,wy=b.y-b.h/2+12+Math.floor(n/4)*20;ctx.fillStyle=(n%3?'#5de9e0':'#f3b95f');ctx.globalAlpha=.65;ctx.fillRect(wx,wy,7,9);ctx.globalAlpha=1}
+   ctx.fillStyle='#a5b9cb';ctx.font='10px sans-serif';ctx.fillText(['HOTEL','ARCADE','PARKING','NIGHT CLUB'][Math.abs(Math.floor(b.x+b.y))%4],b.x-b.w/2+6,b.y+b.h/2+13);
+  }
+  // glowing mission destination
+  const mx=450,my=-300;ctx.strokeStyle='#ff4f91';ctx.lineWidth=4;ctx.shadowColor='#ff4f91';ctx.shadowBlur=22;ctx.beginPath();ctx.arc(mx,my,24+Math.sin(t/220)*5,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.fillText('ЗАДАНИЕ',mx-28,my-34);
+  for(const p of people){if(Math.abs(p.x-camX)>extent||Math.abs(p.y-camY)>extent)continue;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#17202d';ctx.fillRect(p.x-3,p.y+4,6,9)}
+  for(const c of cars){if(Math.abs(c.x-camX)>extent||Math.abs(c.y-camY)>extent)continue;ctx.save();ctx.translate(c.x,c.y);ctx.rotate(-c.a);ctx.fillStyle='#05070b';roundRect(-13,-22,29,48,6);ctx.fillStyle=c.color;roundRect(-14,-24,28,48,6);ctx.fillStyle='#b8e5f4';roundRect(-10,-13,20,12,3);ctx.fillStyle='#e7faff';ctx.fillRect(-10,-22,5,3);ctx.fillRect(5,-22,5,3);ctx.restore()}
+  // player character
+  ctx.save();ctx.translate(player.x,player.y);ctx.rotate(-player.a);ctx.shadowColor='#5df5e7';ctx.shadowBlur=16;ctx.fillStyle='#5df5e7';ctx.beginPath();ctx.arc(0,0,9,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#efffff';ctx.beginPath();ctx.moveTo(0,-15);ctx.lineTo(-5,-5);ctx.lineTo(5,-5);ctx.closePath();ctx.fill();ctx.restore();
+  ctx.restore();
+  // UI
+  ctx.fillStyle='rgba(7,14,25,.82)';roundRect(18,18,Math.min(290,w-36),94,16);ctx.fillStyle='#65f6e7';ctx.font='bold 15px system-ui';ctx.fillText('NEON CITY',32,43);ctx.fillStyle='#eef8ff';ctx.font='13px system-ui';ctx.fillText('Деньги: 
+ const status=document.getElementById('loadStatus');
+ const sources=[
+  'https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js',
+  'https://unpkg.com/three@0.160.0/build/three.min.js',
+  'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js'
+ ];
+ let index=0;
+ function attempt(){
+  if(window.THREE){initGame();return}
+  if(index>=sources.length){
+   if(status)status.textContent='3D-сервер недоступен — запускаем игровой режим без загрузок…';
+   startFallbackGame();
+   return;
+  }
+  if(status)status.textContent='Загрузка 3D-движка… ('+(index+1)+'/'+sources.length+')';
+  const script=document.createElement('script');
+  script.src=sources[index++];
+  script.onload=()=>{if(window.THREE)initGame();else attempt()};
+  script.onerror=attempt;
+  document.head.appendChild(script);
+ }
+ attempt();
+})();
+</script>
+</body></html>+money,32,66);ctx.fillText(carMode?'В машине · E — выйти':'Пешком · E — угнать авто',32,88);
+  ctx.fillStyle='rgba(7,14,25,.82)';roundRect(18,h-72,Math.min(430,w-36),52,13);ctx.fillStyle='#d9eaf5';ctx.font='12px system-ui';ctx.fillText('WASD — движение   SHIFT — ускорение   E — машина   F — сигнал',30,h-42);
+  if(t<toastUntil){ctx.font='bold 14px system-ui';const tw=ctx.measureText(toast).width+34;ctx.fillStyle='rgba(8,18,30,.92)';roundRect((w-tw)/2,24,tw,42,12);ctx.fillStyle='#fff';ctx.fillText(toast,(w-tw)/2+17,50)}
+  if(w<700){ctx.fillStyle='rgba(10,22,36,.8)';roundRect(w-112,h-154,96,132,14);ctx.fillStyle='#fff';ctx.font='12px system-ui';ctx.fillText('КНОПКИ',w-91,h-132);[['KeyW','▲',0,0],['KeyA','◀',-1,1],['KeyS','▼',0,1],['KeyD','▶',1,1]].forEach(([k,label,dx,dy])=>{const x=w-64+dx*27,y=h-106+dy*28;ctx.fillStyle=keys[k]?'#267d83':'#263c51';roundRect(x-12,y-12,24,24,6);ctx.fillStyle='#fff';ctx.fillText(label,x-5,y+4)})}
+ }
+}
 (function loadThree(){
  const status=document.getElementById('loadStatus');
  const sources=[
