@@ -1,195 +1,132 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#080b12">
-<title>NEON CITY — Open World</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#070b12"><title>NEON CITY 3D</title>
 <style>
-:root{--cyan:#65f6e7;--pink:#ff4f91;--glass:#0a1020dc}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;color:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;touch-action:none}canvas{position:fixed;inset:0;width:100%;height:100%;display:block}button{font:inherit;color:#fff;border:1px solid #ffffff25;background:#111a2de8;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800;letter-spacing:.04em;box-shadow:0 8px 28px #0005;transition:transform .15s,border-color .15s}button:hover{border-color:var(--cyan);transform:translateY(-1px)}button:active{transform:scale(.97)}.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:linear-gradient(120deg,#060914dd,#06091488 55%,#080b12dd);z-index:10}.panel{width:min(720px,100%);border:1px solid #ffffff22;background:linear-gradient(145deg,#111a2bf2,#080d18f5);border-radius:24px;padding:clamp(22px,5vw,42px);box-shadow:0 28px 100px #000a;backdrop-filter:blur(18px)}.eyebrow{font-size:11px;letter-spacing:.28em;color:var(--cyan);font-weight:900}.logo{font-size:clamp(42px,10vw,86px);line-height:.92;letter-spacing:-.07em;font-weight:1000;margin:15px 0}.logo span{color:var(--cyan);text-shadow:0 0 35px #65f6e755}.sub{color:#a9b6ca;line-height:1.65;max-width:540px}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.primary{background:linear-gradient(110deg,#4de4d5,#75f6e7);color:#061218;border:0}.featuregrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:24px}.feature{padding:13px;border:1px solid #ffffff13;background:#ffffff06;border-radius:13px}.feature b{display:block;font-size:12px;margin-bottom:5px}.feature small{font-size:11px;color:#8d9cb3;line-height:1.4}.hud{position:fixed;inset:0;pointer-events:none;display:none;z-index:3}.hudbox{position:absolute;background:#08101ddd;border:1px solid #ffffff20;box-shadow:0 10px 30px #0005;backdrop-filter:blur(12px);border-radius:14px;padding:12px 15px}.top-left{top:16px;left:16px;min-width:190px}.brand{font-size:12px;letter-spacing:.16em;font-weight:1000;color:var(--cyan)}.district{font-size:11px;color:#aab6c9;margin-top:5px}.money{font-size:23px;font-weight:950;margin-top:6px}.top-right{top:16px;right:16px;width:min(235px,47vw)}.statline{display:flex;justify-content:space-between;font-size:11px;color:#b3bfd1;margin:5px 0}.bar{height:5px;background:#ffffff18;border-radius:99px;overflow:hidden;margin:6px 0 10px}.bar i{display:block;height:100%;background:var(--cyan);width:100%;border-radius:99px}.mission{left:16px;top:152px;width:min(280px,58vw)}.mission strong{font-size:10px;letter-spacing:.18em;color:var(--pink)}.mission p{font-size:13px;line-height:1.5;margin:8px 0;color:#e8edf6}.mission small{color:#8e9cb3;font-size:11px}.hint{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);white-space:nowrap;text-align:center;font-size:11px;color:#e3eaf4;background:#07101ddd;border:1px solid #ffffff20;border-radius:12px;padding:10px 15px}.minimap{position:absolute;right:16px;bottom:16px;width:150px;height:150px;border-radius:16px;border:1px solid #ffffff3a;background:#07101ddd;overflow:hidden}.minimap canvas{position:absolute;width:100%;height:100%}.toast{position:absolute;left:50%;top:24%;transform:translate(-50%,-10px);opacity:0;background:#091323ed;border:1px solid #65f6e766;padding:12px 18px;border-radius:12px;font-weight:800;font-size:12px;transition:.2s;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}.mobile{position:fixed;z-index:5;inset:auto 0 18px;display:none;justify-content:space-between;padding:0 18px;pointer-events:none}.pad,.mobile-actions{display:grid;gap:7px;pointer-events:auto}.pad{grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,45px)}.pad button,.mobile-actions button{padding:0;background:#07101dcc;border-color:#ffffff32;backdrop-filter:blur(8px);font-size:13px;touch-action:none}.pad .up{grid-column:2}.pad .left{grid-column:1;grid-row:2}.pad .down{grid-column:2;grid-row:2}.pad .right{grid-column:3;grid-row:2}.mobile-actions{grid-template-columns:repeat(2,58px);align-content:end}.mobile-actions button{height:45px}.pause{position:absolute;top:92px;right:16px;pointer-events:auto;padding:8px 12px}.modal{position:fixed;inset:0;z-index:12;background:#03060bd9;display:none;align-items:center;justify-content:center;padding:18px}.modal .panel{max-width:500px}.modal h2{margin:8px 0 10px}.garage-cars{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}.garage-cars button{text-align:left}.garage-cars small{display:block;color:#9daac0;margin-top:5px;font-weight:500;letter-spacing:0}.tiny{font-size:10px;color:#8392a9;line-height:1.5;margin-top:18px}@media(max-width:650px){.featuregrid{grid-template-columns:1fr}.feature:nth-child(n+3){display:none}.top-left{top:10px;left:10px;min-width:150px;padding:9px 11px}.top-right{top:10px;right:10px;padding:9px 11px}.money{font-size:18px}.mission{top:112px;left:10px;padding:10px;width:190px}.mission p{font-size:11px}.minimap{width:108px;height:108px;right:10px;bottom:112px}.hint{bottom:82px;font-size:10px;max-width:calc(100% - 24px);white-space:normal}.mobile{display:flex}.pause{top:82px;right:10px}.panel{border-radius:18px}.logo{font-size:54px}}@media(hover:none){.mobile{display:flex}}
+:root{color-scheme:dark;--cyan:#65f6e7;--pink:#ff4f91;--panel:#101927eF}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070b12;color:#edfaff;font-family:Inter,system-ui,Segoe UI,sans-serif}button{font:inherit;cursor:pointer;color:#efffff;background:#142332;border:1px solid #42616d;border-radius:12px;padding:10px 13px;transition:.15s}button:hover{border-color:var(--cyan);background:#1b3744}button:active{transform:scale(.97)}#game{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}.panel{background:var(--panel);border:1px solid #31505d;border-radius:15px;backdrop-filter:blur(12px);box-shadow:0 10px 35px #0005}.hud{display:none;position:fixed;inset:0;pointer-events:none}.hud>*{pointer-events:auto}.top{position:absolute;left:14px;top:14px;padding:12px 15px;min-width:200px}.brand{font-weight:1000;letter-spacing:3px;color:var(--cyan);font-size:14px}.small{font-size:12px;color:#a8c0cb}.money{font-size:21px;font-weight:850;margin-top:6px}.topright{position:absolute;right:14px;top:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:55%}.mission{position:absolute;left:14px;bottom:14px;width:min(300px,calc(100vw - 28px));padding:13px}.mission h3{margin:0 0 7px;color:var(--cyan);font-size:14px}.mission p{font-size:12px;color:#b6c8d1;margin:0 0 10px;line-height:1.5}.actions{position:absolute;right:14px;bottom:14px;display:grid;grid-template-columns:repeat(2,minmax(94px,1fr));gap:8px;width:min(300px,45vw)}.actions button{min-height:44px;font-weight:700}.primary{background:#0d4c50;border-color:#65f6e7}.danger{border-color:#a84768}.center{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#153c4b99,#050810f5 75%);z-index:10;padding:20px}.startcard{width:min(540px,100%);padding:clamp(22px,5vw,42px);text-align:center}.logo{font-size:clamp(36px,9vw,68px);font-weight:1000;line-height:.95;letter-spacing:-3px;color:#f1ffff;text-shadow:0 0 28px #65f6e788}.logo span{color:var(--cyan)}.startcard p{color:#b5cbd5;line-height:1.6}.startcard .primary{font-size:16px;padding:14px 25px;margin-top:8px}.hint{font-size:12px!important;color:#91aab6!important}.toast{position:fixed;top:88px;left:50%;transform:translateX(-50%);padding:10px 16px;background:#10202ced;border:1px solid #65f6e7;border-radius:12px;opacity:0;transition:.2s;pointer-events:none;z-index:30;text-align:center;max-width:90vw}.toast.show{opacity:1}.modal{display:none;position:fixed;inset:0;z-index:20;align-items:center;justify-content:center;background:#03070bd9;padding:20px}.modal .box{width:min(420px,100%);padding:20px}.modal h2{margin:0 0 8px}.garageitem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #29404c}.garageitem:last-child{border:0}.key{display:inline-block;padding:2px 6px;border:1px solid #54707a;border-radius:5px;background:#15232d;font-size:11px}.reticle{position:absolute;left:50%;top:50%;width:10px;height:10px;border:1px solid #a6fff5;border-radius:50%;transform:translate(-50%,-50%);opacity:.65}.mobile{display:none;position:absolute;left:50%;bottom:155px;transform:translateX(-50%);gap:8px}.mobile button{width:49px;height:49px;padding:0;background:#0c1728dd}.status{font-size:12px;color:#ff8eaf;margin-top:5px}@media(max-width:650px){.top{top:8px;left:8px;min-width:150px;padding:9px}.topright{top:8px;right:8px;gap:5px;max-width:52%}.topright button{font-size:11px;padding:8px}.mission{left:8px;bottom:8px;width:calc(100vw - 16px);max-width:260px;padding:10px}.actions{right:8px;bottom:8px;width:calc(100vw - 290px);min-width:126px;grid-template-columns:1fr}.actions button{font-size:11px;padding:8px;min-height:37px}.mobile{display:flex;bottom:185px}.money{font-size:17px}.small{font-size:10px}}@media(max-width:390px){.mission{max-width:190px}.actions{width:130px}.topright{max-width:48%}}
 </style>
 </head>
 <body>
-<canvas id="world" aria-label="Игровой мир NEON CITY"></canvas>
-<div id="start" class="overlay"><div class="panel"><div class="eyebrow">OPEN WORLD • CITY STORIES</div><div class="logo">NEON<br><span>CITY</span></div><div class="sub">Ночной мегаполис живёт своей жизнью. Садись за руль, исследуй разные районы, выполняй контракты, уходи от полиции и собирай деньги. Всё нарисовано прямо в игре — без загрузки картинок и тяжёлых 3D-библиотек.</div><div class="actions"><button class="primary" id="startBtn">ВОЙТИ В ГОРОД ↗</button><button id="howBtn">УПРАВЛЕНИЕ</button></div><div class="featuregrid"><div class="feature"><b>01 / OPEN WORLD</b><small>Центр, порт, старый город и неоновый район</small></div><div class="feature"><b>02 / DRIVE</b><small>Разгон, торможение, заносы и нитро</small></div><div class="feature"><b>03 / WANTED</b><small>Контракты, NPC, оружие и погоня</small></div></div><div class="tiny">Браузерная оригинальная игра, вдохновлённая открытыми криминальными песочницами. Не является GTA V.</div></div></div>
-<div id="hud" class="hud"><div class="hudbox top-left"><div class="brand">NEON CITY <span style="color:#fff">/ ONLINE</span></div><div id="district" class="district">ДЕЛОВОЙ ЦЕНТР</div><div id="cash" class="money">$ 2,450</div></div><div class="hudbox top-right"><div class="statline"><span>ЗДОРОВЬЕ</span><b id="healthNum">100%</b></div><div class="bar"><i id="healthBar"></i></div><div class="statline"><span>РОЗЫСК</span><b id="wanted">☆☆☆☆☆</b></div><div class="statline"><span>ТРАНСПОРТ</span><b id="vehicleName">ПЕШКОМ</b></div><div class="statline"><span>СКОРОСТЬ</span><b id="speed">0 KM/H</b></div></div><div class="hudbox mission"><strong>ТЕКУЩИЙ КОНТРАКТ</strong><p id="missionText">Доберись до жёлтого маркера, чтобы начать первое задание.</p><small id="missionMeta">НАГРАДА: $750</small></div><button id="pauseBtn" class="pause">Ⅱ</button><div class="hint" id="hint">WASD — движение · E — машина / гараж · F — действие · Shift — нитро</div><div id="toast" class="toast"></div><div class="minimap"><canvas id="map"></canvas></div></div>
-<div class="mobile"><div class="pad"><button class="up" data-key="w">▲</button><button class="left" data-key="a">◀</button><button class="down" data-key="s">▼</button><button class="right" data-key="d">▶</button></div><div class="mobile-actions"><button data-key="e">E · CAR</button><button data-key="shift">NITRO</button><button data-key="f">F · USE</button><button data-key=" ">BRAKE</button></div></div>
-<div id="garage" class="modal"><div class="panel"><div class="eyebrow">SAFEHOUSE / VEHICLE BAY</div><h2>Гараж</h2><div class="sub">Выбери машину для следующего заезда. Улучшенные автомобили быстрее и лучше держат дорогу.</div><div class="garage-cars"><button data-car="coupe">STREET COUPE<small>Сбалансированная · бесплатно</small></button><button data-car="sport">VIPER SPORT<small>Высокая скорость · $1,200</small></button><button data-car="muscle">IRON MUSCLE<small>Мощный разгон · $850</small></button><button data-car="electric">VOLT GT<small>Точный контроль · $1,600</small></button></div><div class="actions"><button id="closeGarage">ЗАКРЫТЬ</button></div></div></div>
-<div id="pause" class="modal"><div class="panel"><div class="eyebrow">SYSTEM PAUSED</div><h2>Пауза</h2><div class="sub">Город подождёт. Вернись, когда будешь готов.</div><div class="actions"><button class="primary" id="resumeBtn">ПРОДОЛЖИТЬ</button><button id="restartBtn">НАЧАТЬ ЗАНОВО</button></div></div></div>
+<div id="game"></div>
+<div class="center" id="start"><div class="startcard panel"><div class="brand">OPEN WORLD PROJECT</div><div class="logo">NEON<br><span>CITY</span> 3D</div><p>Живой ночной город. Угоняй машины, исследуй районы и выполняй контракты.</p><button class="primary" id="startBtn">ВОЙТИ В ГОРОД</button><p class="hint">Управление: <b>W A S D</b> · E — угнать / выйти · Shift — ускорение · Space — ручник · F — действие</p><div class="status" id="loadStatus">Загрузка 3D-движка…</div></div></div>
+<div class="hud" id="hud">
+ <div class="top panel"><div class="brand">NEON CITY <span style="color:#fff">/ 3D</span></div><div class="small" id="district">ЦЕНТР ГОРОДА</div><div class="money" id="cash">$ 2 500</div><div class="small" id="vehicleName">ПЕШКОМ</div><div class="status" id="wanted"></div></div>
+ <div class="topright"><button id="garageBtn">▣ Гараж</button><button id="missionBtn">✦ Задания</button><button id="soundBtn">♫ Звук: Вкл.</button><button id="pauseBtn">Ⅱ Пауза</button></div>
+ <div class="reticle"></div>
+ <div class="mission panel"><h3 id="missionTitle">КОНТРАКТ: ПЕРВАЯ ПОЕЗДКА</h3><p id="missionText">Подойди к машине и нажми E, чтобы угнать её. Затем доедь до отмеченной точки.</p><button id="missionAction" class="primary">Принять задание</button></div>
+ <div class="actions"><button id="enterBtn" class="primary">E · Угнать машину</button><button id="actionBtn">F · Действие</button><button id="hornBtn">H · Клаксон</button><button id="mapBtn">M · Карта района</button></div>
+ <div class="mobile"><button data-key="KeyW">▲</button><button data-key="KeyA">◀</button><button data-key="KeyS">▼</button><button data-key="KeyD">▶</button></div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="garage"><div class="box panel"><h2>Гараж</h2><p class="small">Покупай машины или пересаживайся в ближайшую.</p><div id="garageList"></div><button id="closeGarage" style="width:100%;margin-top:14px">Закрыть</button></div></div>
+<div class="modal" id="missionModal"><div class="box panel"><h2>Задания города</h2><div id="missionList"></div><button id="closeMissions" style="width:100%;margin-top:14px">Закрыть</button></div></div>
+<div class="modal" id="pauseModal"><div class="box panel"><h2>Пауза</h2><p>Игра приостановлена.</p><button id="resumeBtn" class="primary" style="width:100%">Продолжить</button></div></div>
+<div class="modal" id="mapModal"><div class="box panel"><h2>Районы города</h2><p>Центр — небоскрёбы и офисы.</p><p>Неон-стрит — клубы и яркие вывески.</p><p>Порт — склады и контейнеры.</p><p>Старый город — низкие здания и узкие кварталы.</p><button id="closeMap" style="width:100%;margin-top:14px">Закрыть</button></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
 <script>
-(function(){
+(()=>{
 'use strict';
-const canvas=document.getElementById('world'),ctx=canvas.getContext('2d',{alpha:false}),mapCanvas=document.getElementById('map'),mctx=mapCanvas.getContext('2d');
-const $=id=>document.getElementById(id);
-let W=0,H=0,DPR=1,started=false,paused=false,garageOpen=false,last=0,toastTimer=0;
-const keys={};const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));const rand=(a,b)=>a+Math.random()*(b-a);const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
-const WORLD={w:3200,h:3200,block:320,road:88};
-const districts=[{name:'ДЕЛОВОЙ ЦЕНТР',x:0,y:0,w:1600,h:1600},{name:'СТАРЫЙ ГОРОД',x:1600,y:0,w:1600,h:1600},{name:'НЕОНОВЫЙ РАЙОН',x:0,y:1600,w:1600,h:1600},{name:'ПОРТОВАЯ ЗОНА',x:1600,y:1600,w:1600,h:1600}];
-const palette=['#26364b','#314158','#263c46','#3d344b','#39414a','#27374a','#4b3a45'];
-const player={x:420,y:450,angle:0,speed:0,health:100,cash:2450,wanted:0,vehicle:null,weaponCooldown:0,invuln:0};
-const cars=[],npcs=[],bullets=[],particles=[],buildings=[],trees=[],missions=[];
-let audioCtx=null,masterGain=null,engineOsc=null,engineGain=null,ambienceOsc=null,ambienceGain=null,lastFootstep=0;
-let activeMission=0,missionProgress=0,missionComplete=0,garage={x:480,y:620,r:48},copSpawn=0,policeHeat=0,frame=0;
-const carTypes={coupe:{name:'STREET COUPE',max:370,acc:220,turn:2.6,grip:3.6,color:'#e94e6d',price:0},sport:{name:'VIPER SPORT',max:500,acc:275,turn:2.8,grip:3.1,color:'#5ce6dc',price:1200},muscle:{name:'IRON MUSCLE',max:410,acc:310,turn:2.1,grip:2.3,color:'#e5a14e',price:850},electric:{name:'VOLT GT',max:430,acc:245,turn:3.25,grip:4.3,color:'#a68cff',price:1600}};
-function resize(){DPR=Math.min(window.devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=Math.round(W*DPR);canvas.height=Math.round(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0);mapCanvas.width=300;mapCanvas.height=300}
-window.addEventListener('resize',resize);resize();
-function makeCar(x,y,type,traffic=false){const spec=carTypes[type]||carTypes.coupe;return{x,y,angle:rand(0,Math.PI*2),speed:traffic?rand(35,100):0,vx:0,vy:0,type,color:traffic?['#e4e7ed','#d8aa64','#6c89a8','#b3c0cf'][Math.floor(rand(0,4))]:spec.color,traffic,police:false,health:100};}
-function buildWorld(){
- // City blocks, parks, plazas and street furniture are procedural: no external image assets.
- for(let bx=0;bx<WORLD.w;bx+=WORLD.block){for(let by=0;by<WORLD.h;by+=WORLD.block){
- const cx=bx+WORLD.block/2,cy=by+WORLD.block/2;
- if(bx===0&&by===0){buildings.push({x:bx+WORLD.road+15,y:by+WORLD.road+15,w:120,h:105,color:'#23364a',kind:'garage'});continue;}
- if(Math.random()<.12){trees.push({x:cx,y:cy,r:55,park:true});for(let i=0;i<12;i++)trees.push({x:bx+WORLD.road+rand(15,WORLD.block-WORLD.road-15),y:by+WORLD.road+rand(15,WORLD.block-WORLD.road-15),r:rand(6,13)});continue;}
- const left=bx+WORLD.road+15,top=by+WORLD.road+15,avail=WORLD.block-WORLD.road-44;
- const n=Math.random()<.5?1:2;
- for(let j=0;j<n;j++){const bw=n===1?avail:avail/2-8,bh=avail-rand(0,20),x=left+j*(bw+16),y=top;
- const b={x,y,w:bw,h:bh,color:palette[Math.floor(rand(0,palette.length))],height:rand(18,70),kind:'building',windows:[]};
- for(let wx=x+10;wx<x+bw-6;wx+=14)for(let wy=y+10;wy<y+bh-5;wy+=15)if(Math.random()<.72)b.windows.push({x:wx,y:wy,on:Math.random()<.72,color:Math.random()<.3?'#ffb45e':'#7be8ef'});
- buildings.push(b);
+const $=id=>document.getElementById(id),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a);
+let scene,camera,renderer,clock,started=false,paused=false,audioCtx=null,master=null,engineOsc=null,engineGain=null,muted=false,toastTimer=0;
+const keys={},WORLD={size:720,spacing:120,road:26,block:120},cars=[],traffic=[],npcs=[],buildings=[],bullets=[];
+let player,activeCar=null,cash=2500,wanted=0,missionActive=false,missionStage=0,missionTarget,missionDone=0,policeTimer=0,police=[];
+const carSpecs=[{name:'Comet Sport',price:0,color:0x22d7d0,speed:37,accel:24},{name:'Night Runner',price:1200,color:0xff4f91,speed:48,accel:29},{name:'Vortex GT',price:2800,color:0xffbe55,speed:58,accel:34}];
+const missions=[{name:'Первая поездка',desc:'Угони машину клавишей E и доберись до светящейся точки.',reward:700},{name:'Неоновый курьер',desc:'Доберись до маркера в другом районе на машине.',reward:1100},{name:'Уход от полиции',desc:'Набери розыск и продержись, пока полиция не отстанет.',reward:1500}];
+function say(s){const t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2300)}
+function audioInit(){if(muted)return;if(audioCtx){if(audioCtx.state==='suspended')audioCtx.resume();return}const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioCtx=new AC();master=audioCtx.createGain();master.gain.value=.2;master.connect(audioCtx.destination);engineOsc=audioCtx.createOscillator();engineOsc.type='sawtooth';engineOsc.frequency.value=48;engineGain=audioCtx.createGain();engineGain.gain.value=0;engineOsc.connect(engineGain);engineGain.connect(master);engineOsc.start()}
+function sound(freq=440,duration=.12,type='sine',volume=.08){if(muted||!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain(),t=audioCtx.currentTime;o.type=type;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(Math.max(40,freq*.55),t+duration);g.gain.setValueAtTime(volume,t);g.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(g);g.connect(master);o.start();o.stop(t+duration+.02)}
+function mat(color,rough=.72,metal=0){return new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal})}
+function box(parent,x,y,z,sx,sy,sz,material){const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
+function cylinder(parent,x,y,z,r1,r2,h,material,segments=10){const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,segments),material);m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m}
+function createWorld(){
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x070d19);scene.fog=new THREE.FogExp2(0x070d19,.0019);
+ camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,1200);
+ renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;$('game').appendChild(renderer.domElement);
+ clock=new THREE.Clock();scene.add(new THREE.HemisphereLight(0x9fcaff,0x19202a,2.1));
+ const moon=new THREE.DirectionalLight(0xb5dfff,2.2);moon.position.set(-120,180,90);moon.castShadow=true;moon.shadow.mapSize.set(1024,1024);moon.shadow.camera.left=-180;moon.shadow.camera.right=180;moon.shadow.camera.top=180;moon.shadow.camera.bottom=-180;scene.add(moon);
+ const ground=box(scene,0,-.65,0,720,1,720,mat(0x18212a));ground.receiveShadow=true;
+ const asphalt=mat(0x252d38,.94),sidewalk=mat(0x6d7881),lineMat=new THREE.MeshBasicMaterial({color:0xe7c96d}),grass=mat(0x263b39),windowMats=[mat(0x315b71,.3,.3),mat(0x7b5c42,.3,.3),mat(0x244a59,.3,.3)];
+ for(let n=-3;n<=3;n++){let road=box(scene,0,-.12,n*WORLD.spacing,WORLD.size,.12,WORLD.road,asphalt);road.receiveShadow=true;road=box(scene,n*WORLD.spacing,-.12,0,WORLD.road,.12,WORLD.size,asphalt);road.receiveShadow=true;
+ for(let t=-340;t<350;t+=15){box(scene,t,-.045,n*WORLD.spacing,6,.02,.18,lineMat);box(scene,n*WORLD.spacing,-.045,t,.18,.02,6,lineMat)}
  }
- }}
- // Landmark arena and pier-side warehouses.
- buildings.push({x:1920,y:210,w:500,h:350,color:'#293a4c',height:25,kind:'stadium',windows:[]});
- buildings.push({x:2170,y:2400,w:420,h:190,color:'#293e4b',height:16,kind:'warehouse',windows:[]});
- // Traffic routes are aligned with the city grid.
- for(let i=0;i<34;i++){
- const horizontal=Math.random()<.5,roadIndex=Math.floor(rand(0,WORLD.w/WORLD.block)),laneOffset=Math.random()<.5?-18:18,dir=Math.random()<.5?1:-1;
- const lane=roadIndex*WORLD.block+WORLD.road/2+laneOffset,t=rand(80,WORLD.w-80),type=['coupe','muscle','electric'][Math.floor(rand(0,3))];
- const c=makeCar(horizontal?t:lane,horizontal?lane:t,type,true);c.axis=horizontal?'h':'v';c.dir=dir;c.lane=lane;c.speed=rand(45,90);c.angle=horizontal?(dir>0?0:Math.PI):(dir>0?Math.PI/2:-Math.PI/2);cars.push(c);
-}
- for(let i=0;i<95;i++){
- const horizontal=Math.random()<.5,blockX=Math.floor(rand(0,WORLD.w/WORLD.block)),blockY=Math.floor(rand(0,WORLD.h/WORLD.block)),dir=Math.random()<.5?1:-1;
- const axis=horizontal?'h':'v',lane=horizontal?blockY*WORLD.block+WORLD.road+rand(5,12):blockX*WORLD.block+WORLD.road+rand(5,12);
- const along=rand(WORLD.road+22,WORLD.block-18),x=horizontal?blockX*WORLD.block+along:lane,y=horizontal?lane:blockY*WORLD.block+along;
- npcs.push({x,y,angle:horizontal?(dir>0?0:Math.PI):(dir>0?Math.PI/2:-Math.PI/2),speed:rand(9,19),color:['#d5a27f','#c9d3e5','#e8c66a','#8ecac4','#d18caa'][Math.floor(rand(0,5))],panic:0,axis,dir,lane,blockX,blockY});
-}
- missions.push({x:1120,y:420,title:'КУРЬЕРСКИЙ ЗАЕЗД',desc:'Забери посылку и доставь её к порту.',reward:750,type:'delivery',target:{x:2680,y:2500},progress:0});
- missions.push({x:2440,y:660,title:'УЛИЧНЫЙ СПРИНТ',desc:'Доберись до финиша быстрее таймера.',reward:1100,type:'race',target:{x:850,y:2050},progress:0});
- missions.push({x:700,y:2550,title:'ВОЗВРАТ ДОЛГА',desc:'Доберись до отмеченной точки и переживи погоню.',reward:1500,type:'wanted',target:{x:2500,y:1300},progress:0});
-}
-buildWorld();
-function districtAt(x,y){return districts.find(d=>x>=d.x&&x<d.x+d.w&&y>=d.y&&y<d.y+d.h)?.name||'ОКРАИНА';}
-function active(){return missions[activeMission%missions.length]}
-function audioInit(){
- if(audioCtx){if(audioCtx.state==='suspended')audioCtx.resume();return}
- const AC=window.AudioContext||window.webkitAudioContext;if(!AC){notify('Звук недоступен в этом браузере');return}
- audioCtx=new AC();masterGain=audioCtx.createGain();masterGain.gain.value=.22;masterGain.connect(audioCtx.destination);
- engineOsc=audioCtx.createOscillator();engineOsc.type='sawtooth';engineOsc.frequency.value=48;engineGain=audioCtx.createGain();engineGain.gain.value=0;engineOsc.connect(engineGain);engineGain.connect(masterGain);engineOsc.start();
- ambienceOsc=audioCtx.createOscillator();ambienceOsc.type='sine';ambienceOsc.frequency.value=58;ambienceGain=audioCtx.createGain();ambienceGain.gain.value=.018;ambienceOsc.connect(ambienceGain);ambienceGain.connect(masterGain);ambienceOsc.start();
-}
-function sfx(kind){
- if(!audioCtx)return;const t=audioCtx.currentTime,osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.connect(gain);gain.connect(masterGain);
- const cfg={click:[520,.07,'sine'],enter:[330,.18,'triangle'],cash:[880,.2,'sine'],shoot:[115,.09,'sawtooth'],horn:[220,.24,'square'],police:[740,.3,'sawtooth'],door:[180,.12,'triangle'],mission:[660,.25,'triangle']};
- const v=cfg[kind]||cfg.click;osc.type=v[2];osc.frequency.setValueAtTime(v[0],t);osc.frequency.exponentialRampToValueAtTime(Math.max(35,v[0]*.48),t+v[1]);gain.gain.setValueAtTime(kind==='shoot'?.12:.08,t);gain.gain.exponentialRampToValueAtTime(.001,t+v[1]);osc.start(t);osc.stop(t+v[1]+.02);
-}
-function notify(s){const el=$('toast');el.textContent=s;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2100)}
-function enterGame(){audioInit();sfx('enter');started=true;paused=false;$('start').style.display='none';$('hud').style.display='block';last=performance.now();notify('Добро пожаловать в NEON CITY');requestAnimationFrame(loop)}
-function startMission(m){activeMission=missions.indexOf(m);m.progress=1;missionProgress=1;sfx('mission');notify('Контракт принят: '+m.title);if(m.type==='wanted'){player.wanted=Math.max(player.wanted,2);policeHeat=35}}
-function openGarage(){garageOpen=true;$('garage').style.display='flex';paused=true}
-function closeGarage(){garageOpen=false;$('garage').style.display='none';paused=false;last=performance.now()}
-function buyCar(type){const spec=carTypes[type];if(!spec)return;if(player.cash<spec.price){notify('Не хватает денег');return}sfx('cash');player.cash-=spec.price;player.vehicle=makeCar(player.x,player.y,type,false);player.vehicle.angle=player.angle;player.x=player.vehicle.x;player.y=player.vehicle.y;$('vehicleName').textContent=spec.name;closeGarage();notify(spec.name+' готов к заезду')}
-document.querySelectorAll('[data-car]').forEach(b=>b.addEventListener('click',()=>buyCar(b.dataset.car)));
-$('startBtn').addEventListener('click',enterGame);$('howBtn').addEventListener('click',()=>notify('WASD двигаться · E сесть/выйти · F действие/огонь · Shift нитро · Space ручник'));
-$('closeGarage').addEventListener('click',closeGarage);$('pauseBtn').addEventListener('click',()=>{paused=true;$('pause').style.display='flex'});$('resumeBtn').addEventListener('click',()=>{paused=false;$('pause').style.display='none';last=performance.now()});
-$('restartBtn').addEventListener('click',()=>{location.reload()});
-function interact(){
- if(player.vehicle){player.x=player.vehicle.x+Math.cos(player.vehicle.angle+1.4)*30;player.y=player.vehicle.y+Math.sin(player.vehicle.angle+1.4)*30;player.vehicle=null;sfx('door');$('vehicleName').textContent='ПЕШКОМ';notify('Ты вышел из машины');return}
- if(dist(player,garage)<105){openGarage();return}
- let nearest=null,nd=65;for(const c of cars){if(c.traffic&&!c.police){const d=dist(player,c);if(d<nd){nearest=c;nd=d}}}
- if(nearest){nearest.traffic=false;player.vehicle=nearest;player.x=nearest.x;player.y=nearest.y;sfx('door');$('vehicleName').textContent=carTypes[nearest.type].name;notify('Машина угнана · розыск повышен');player.wanted=Math.min(5,player.wanted+1);return}
- const m=active();if(dist(player,m)<95){startMission(m);return}
- notify('Рядом нет машины, гаража или задания');
-}
-function fire(){if(player.weaponCooldown>0)return;player.weaponCooldown=.28;sfx('shoot');const source=player.vehicle||player;const angle=player.vehicle?player.vehicle.angle:player.angle;bullets.push({x:source.x+Math.cos(angle)*20,y:source.y+Math.sin(angle)*20,vx:Math.cos(angle)*580,vy:Math.sin(angle)*580,life:.8});player.wanted=Math.min(5,player.wanted+1);for(const n of npcs)if(Math.hypot(n.x-source.x,n.y-source.y)<170)n.panic=5;}
-function keydown(e){const k=e.key.toLowerCase();if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();keys[k]=true;if(!started){if(k==='enter')enterGame();return}if(k==='e'&&!paused)interact();if(k==='f'&&!paused){const m=active();if(dist(player,m)<100)startMission(m);else fire()}if(k==='escape'){if(garageOpen)closeGarage();else if($('pause').style.display==='flex'){$('pause').style.display='none';paused=false;last=performance.now()}else{paused=true;$('pause').style.display='flex'}}}
-function keyup(e){keys[e.key.toLowerCase()]=false}
-window.addEventListener('keydown',keydown);window.addEventListener('keyup',keyup);window.addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
-document.querySelectorAll('[data-key]').forEach(b=>{const k=b.dataset.key;b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true;b.setPointerCapture?.(e.pointerId)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,()=>keys[k]=false))});
-function roadAt(x,y){const bx=((x%WORLD.block)+WORLD.block)%WORLD.block,by=((y%WORLD.block)+WORLD.block)%WORLD.block;return bx<WORLD.road||by<WORLD.road}
-function collideBuildings(x,y,r){for(const b of buildings){if(x+r>b.x&&x-r<b.x+b.w&&y+r>b.y&&y-r<b.y+b.h)return true}return false}
-function update(dt){
- frame++;player.weaponCooldown=Math.max(0,player.weaponCooldown-dt);player.invuln=Math.max(0,player.invuln-dt);
- const m=active(),p=player.vehicle||player;
- if(player.vehicle){
- const c=player.vehicle,spec=carTypes[c.type];const gas=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0),steer=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);
- const boost=keys.shift?1.65:1;const grip=keys[' '] ? 0.45 : 1;
- c.speed+=gas*spec.acc*dt*(keys.shift?1.12:1);c.speed*=Math.max(0,1-dt*(gas?0.36:1.1));c.speed=clamp(c.speed,-spec.max*.42,spec.max*boost);
- c.angle+=steer*spec.turn*dt*clamp(Math.abs(c.speed)/65,.15,1)*Math.sign(c.speed||1)*grip;
- const nx=c.x+Math.cos(c.angle)*c.speed*dt,ny=c.y+Math.sin(c.angle)*c.speed*dt;
- if(!collideBuildings(nx,ny,17)){c.x=nx;c.y=ny}else{c.speed*=-.28;player.health=Math.max(0,player.health-.8)}
- c.x=clamp(c.x,30,WORLD.w-30);c.y=clamp(c.y,30,WORLD.h-30);player.x=c.x;player.y=c.y;player.angle=c.angle;
- }else{
- const dx=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0),dy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);
- if(dx||dy){player.angle=Math.atan2(dy,dx);const speed=keys.shift?260:160;const nx=player.x+dx/Math.hypot(dx,dy)*speed*dt,ny=player.y+dy/Math.hypot(dx,dy)*speed*dt;if(!collideBuildings(nx,ny,10)){player.x=nx;player.y=ny}}
- }
- // Civilian traffic follows streets and avoids leaving the map.
- for(const c of cars){if(c===player.vehicle)continue;if(c.police){const angle=Math.atan2(player.y-c.y,player.x-c.x);c.angle=angle;c.speed=Math.min(210,c.speed+45*dt);c.x+=Math.cos(angle)*c.speed*dt;c.y+=Math.sin(angle)*c.speed*dt;if(dist(c,player)<30&&player.invuln<=0){player.health=Math.max(0,player.health-8);player.invuln=1;player.vehicle&&(player.vehicle.speed*=.55);notify('Полиция таранит машину')}}else if(c.traffic){
- if(c.axis==='h'){c.x+=c.dir*c.speed*dt;c.y=c.lane;if(c.x>WORLD.w+25)c.x=-25;if(c.x< -25)c.x=WORLD.w+25}
- else{c.y+=c.dir*c.speed*dt;c.x=c.lane;if(c.y>WORLD.h+25)c.y=-25;if(c.y< -25)c.y=WORLD.h+25}
- }}
- for(const n of npcs){
- if(n.panic>0){n.panic-=dt;n.angle=Math.atan2(n.y-player.y,n.x-player.x);const nx=n.x+Math.cos(n.angle)*n.speed*2*dt,ny=n.y+Math.sin(n.angle)*n.speed*2*dt;if(!collideBuildings(nx,ny,5)){n.x=nx;n.y=ny}}
- else{
- if(n.axis==='h'){n.x+=n.dir*n.speed*dt;n.y=n.lane;const min=n.blockX*WORLD.block+WORLD.road+18,max=(n.blockX+1)*WORLD.block-12;if(n.x>max){n.blockX=(n.blockX+1)%(WORLD.w/WORLD.block);n.x=n.blockX*WORLD.block+WORLD.road+18;n.dir=1;n.angle=0}else if(n.x<min){n.blockX=(n.blockX-1+WORLD.w/WORLD.block)%(WORLD.w/WORLD.block);n.x=(n.blockX+1)*WORLD.block-12;n.dir=-1;n.angle=Math.PI}}
- else{n.y+=n.dir*n.speed*dt;n.x=n.lane;const min=n.blockY*WORLD.block+WORLD.road+18,max=(n.blockY+1)*WORLD.block-12;if(n.y>max){n.blockY=(n.blockY+1)%(WORLD.h/WORLD.block);n.y=n.blockY*WORLD.block+WORLD.road+18;n.dir=1;n.angle=Math.PI/2}else if(n.y<min){n.blockY=(n.blockY-1+WORLD.h/WORLD.block)%(WORLD.h/WORLD.block);n.y=(n.blockY+1)*WORLD.block-12;n.dir=-1;n.angle=-Math.PI/2}}
+ // Buildings occupy the blocks between roads, leaving visible pavement strips.
+ for(let gx=-3;gx<3;gx++)for(let gz=-3;gz<3;gz++){
+ const baseX=gx*120+60,baseZ=gz*120+60;
+ box(scene,baseX,-.25,baseZ,93,.45,93,sidewalk);
+ box(scene,baseX,-.04,baseZ,85,.12,85,grass);
+ for(let k=0;k<3;k++){
+ const x=baseX+rand(-25,25),z=baseZ+rand(-25,25),h=rand(15,68),w=rand(13,24),d=rand(13,24);
+ const building=box(scene,x,h/2,z,w,h,d,mat([0x263648,0x313746,0x233943,0x3b3545][Math.floor(rand(0,4))],.75,.12));buildings.push({x,z,w,d,h,mesh:building});
+ const wm=windowMats[Math.floor(rand(0,windowMats.length))];
+ for(let yy=3;yy<h-2;yy+=4)for(let xx=-w/2+3;xx<w/2-1;xx+=4){box(scene,x+xx,yy,z+d/2+.07,1.3,1.5,.12,wm);box(scene,x+xx,yy,z-d/2-.07,1.3,1.5,.12,wm)}
+ for(let yy=3;yy<h-2;yy+=4)for(let zz=-d/2+3;zz<d/2-1;zz+=4){box(scene,x+w/2+.07,yy,z+zz,.12,1.5,1.3,wm);box(scene,x-w/2-.07,yy,z+zz,.12,1.5,1.3,wm)}
  }
  }
- for(let i=bullets.length-1;i>=0;i--){const b=bullets[i];b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if(b.life<=0||b.x<0||b.y<0||b.x>WORLD.w||b.y>WORLD.h){bullets.splice(i,1);continue}for(const n of npcs){if(Math.hypot(n.x-b.x,n.y-b.y)<8){n.panic=8;bullets.splice(i,1);break}}}
- for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;if(p.life<=0)particles.splice(i,1)}
- if(player.wanted>0){policeHeat+=dt;if(policeHeat>Math.max(9,28-player.wanted*3)&&cars.filter(c=>c.police).length<player.wanted){sfx('police');const a=rand(0,Math.PI*2);const c=makeCar(clamp(player.x+Math.cos(a)*500,40,WORLD.w-40),clamp(player.y+Math.sin(a)*500,40,WORLD.h-40),'coupe',false);c.police=true;c.color='#f2f5fa';c.speed=100;cars.push(c);policeHeat=0;notify('Внимание: полиция на хвосте')}if(player.wanted>0&&Math.random()<dt*.018){player.wanted--;notify('Уровень розыска снижен')}}else{for(let i=cars.length-1;i>=0;i--)if(cars[i].police)cars.splice(i,1)}
- // Contract logic: reach its marker to accept, then drive to target.
- if(m.progress===1&&dist(player,m.target)<90){sfx('cash');player.cash+=m.reward;missionComplete++;m.progress=2;player.wanted=m.type==='wanted'?Math.max(player.wanted,2):Math.max(0,player.wanted-1);notify('Контракт выполнен: +$'+m.reward);setTimeout(()=>{activeMission=(activeMission+1)%missions.length;missions[activeMission].progress=0;},400)}
- if(player.health<=0){player.health=100;player.wanted=0;player.x=garage.x;player.y=garage.y;player.vehicle=null;player.cash=Math.max(0,player.cash-350);notify('Тебя доставили в клинику · штраф $350')}
- $('district').textContent=districtAt(player.x,player.y);$('cash').textContent='$ '+Math.floor(player.cash).toLocaleString('en-US');$('healthNum').textContent=Math.ceil(player.health)+'%';$('healthBar').style.width=player.health+'%';$('wanted').textContent='★'.repeat(player.wanted)+'☆'.repeat(5-player.wanted);$('speed').textContent=Math.round(Math.abs(player.vehicle?.speed||0)*.48)+' KM/H';$('vehicleName').textContent=player.vehicle?carTypes[player.vehicle.type].name:'ПЕШКОМ';
- const m2=active();$('missionText').textContent=m2.progress===1?'Езжай к точке назначения на карте.':m2.progress===2?'Контракт выполнен. Следующее задание скоро появится.':m2.desc;$('missionMeta').textContent='НАГРАДА: $'+m2.reward+' · '+m2.title;
+ // Lamps along sidewalks
+ for(let x=-300;x<=300;x+=60)for(let z=-300;z<=300;z+=60){if(Math.abs(x%120)<2||Math.abs(z%120)<2){cylinder(scene,x,2,z,.16,.22,4,mat(0x65717b));const bulb=box(scene,x,4.1,z,.65,.2,.65,new THREE.MeshBasicMaterial({color:0x62f5e7}));const light=new THREE.PointLight(0x42ddff,1.5,17);light.position.set(x,4,z);scene.add(light)}}
+ // Decorative waterfront and containers
+ box(scene,350,-.35,0,18,.25,720,mat(0x0d3a50));
+ for(let i=0;i<18;i++){const x=rand(265,330),z=rand(-320,320);box(scene,x,1.8,z,rand(8,14),3.6,rand(8,15),mat([0xa74e55,0x436c8a,0x9c7942][i%3]))}
+ player=makePerson(7,1,12,true);
+ for(let i=0;i<20;i++){const a=rand(0,Math.PI*2),r=rand(65,320);npcs.push(makePerson(Math.cos(a)*r,1,Math.sin(a)*r,false))}
+ for(let i=0;i<18;i++){const axis=Math.random()<.5?'x':'z',lane=Math.round(rand(-2,2))*120+(Math.random()<.5?-5:5),p=rand(-340,340);const c=makeCar(axis==='x'?p:lane,axis==='x'?lane:p,carSpecs[i%carSpecs.length],true);c.axis=axis;c.dir=Math.random()<.5?1:-1;c.speed=rand(9,17);c.lane=lane;c.traffic=true;traffic.push(c);cars.push(c)}
+ for(let i=0;i<7;i++){const axis=i%2?'x':'z',lane=Math.round(rand(-2,2))*120+(Math.random()<.5?-5:5),p=rand(-320,320);const c=makeCar(axis==='x'?p:lane,axis==='x'?lane:p,carSpecs[i%3],false);c.traffic=false;cars.push(c)}
+ missionTarget=makeMarker(100,0,-110);missionTarget.visible=false;scene.add(missionTarget);
 }
-function drawRoads(camX,camY){ctx.fillStyle='#101b26';ctx.fillRect(0,0,W,H);
- ctx.fillStyle='#19272e';for(let x=0;x<WORLD.w;x+=WORLD.block)for(let y=0;y<WORLD.h;y+=WORLD.block)ctx.fillRect(x-camX+WORLD.road,y-camY+WORLD.road,WORLD.block-WORLD.road,WORLD.block-WORLD.road);
- ctx.fillStyle='#59636b';for(let x=0;x<WORLD.w;x+=WORLD.block)for(let y=0;y<WORLD.h;y+=WORLD.block){ctx.fillRect(x-camX+WORLD.road,y-camY+WORLD.road,WORLD.block-WORLD.road,8);ctx.fillRect(x-camX+WORLD.road,y-camY+WORLD.road,8,WORLD.block-WORLD.road)}
- ctx.fillStyle='#25323c';for(let x=0;x<WORLD.w;x+=WORLD.block){ctx.fillRect(x-camX,0,WORLD.road,H);ctx.fillRect(0, x-camY,W,WORLD.road)}
- ctx.strokeStyle='#d9bd68';ctx.lineWidth=1.4;ctx.setLineDash([18,18]);ctx.beginPath();for(let x=0;x<WORLD.w;x+=WORLD.block){ctx.moveTo(x-camX+WORLD.road/2,0);ctx.lineTo(x-camX+WORLD.road/2,H)}for(let y=0;y<WORLD.h;y+=WORLD.block){ctx.moveTo(0,y-camY+WORLD.road/2);ctx.lineTo(W,y-camY+WORLD.road/2)}ctx.stroke();ctx.setLineDash([]);
- // Crosswalks and lane markings.
- ctx.strokeStyle='#d8e2e844';ctx.lineWidth=2;for(let x=0;x<WORLD.w;x+=WORLD.block)for(let y=0;y<WORLD.h;y+=WORLD.block){for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(x-camX+8+i*7,y-camY+8);ctx.lineTo(x-camX+8+i*7,y-camY+WORLD.road-8);ctx.stroke();ctx.beginPath();ctx.moveTo(x-camX+8,y-camY+8+i*7);ctx.lineTo(x-camX+WORLD.road-8,y-camY+8+i*7);ctx.stroke()}}
+function makeCar(x,z,spec,istaff){const g=new THREE.Group();scene.add(g);g.position.set(x,.15,z);g.rotation.y=0;const bodyMat=mat(spec.color,.28,.48),glass=mat(0x132c40,.18,.5),rubber=mat(0x11151b),rim=mat(0x9caeb6,.25,.75);
+ box(g,0,.6,0,2.15,.65,4.3,bodyMat);box(g,0,1.03,-.25,1.65,.5,2.15,glass);box(g,0,1.34,1.55,1.5,.08,.16,mat(0xffffff,.2,.2));box(g,0,1.33,-1.82,1.6,.08,.12,mat(0xff354f,.2));
+ const wheels=[];for(const xw of [-1.08,1.08])for(const zw of [-1.35,1.35]){const w=cylinder(g,xw,.32,zw,.37,.37,.22,rubber,12);w.rotation.z=Math.PI/2;wheels.push(w);const hub=cylinder(g,xw*1.01,.32,zw,.18,.18,.235,rim,10);hub.rotation.z=Math.PI/2}
+ const c={group:g,x,z,angle:0,speed:0,spec,traffic:istaff,axis:null,dir:1,lane:0,wheels,stolen:false,owned:false};c.speed=istaff?rand(8,15):0;return c}
+function makePerson(x,y,z,isPlayer){const g=new THREE.Group();scene.add(g);const skin=mat(isPlayer?0xf4d2b0:0xd6aa8b),shirt=mat(isPlayer?0x25d9d0:[0xd95379,0x4c8cbe,0xe2b64c,0x8b6ed1][Math.floor(rand(0,4))]),pants=mat(0x202c42),shoe=mat(0x0c1118);
+ box(g,0,1.2,0,.68,.95,.38,shirt);cylinder(g,0,1.95,0,.25,.25,.42,skin,12);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.25,12,10),skin);head.position.set(0,2.22,0);g.add(head);
+ const legs=[];for(const xx of [-.19,.19]){const leg=box(g,xx,.55,0,.22,.65,.25,pants);legs.push(leg);box(g,xx,.18,.08,.25,.18,.38,shoe)}
+ const arms=[];for(const xx of [-.48,.48])arms.push(box(g,xx,1.28,0,.18,.72,.2,skin));
+ return {group:g,x,z,y,angle:rand(0,6.28),isPlayer,legs,arms,walk:0,speed:rand(1.5,2.5),panic:0}}
+function makeMarker(x,y,z){const g=new THREE.Group();g.position.set(x,y,z);const ring=new THREE.Mesh(new THREE.TorusGeometry(4,.28,8,32),new THREE.MeshBasicMaterial({color:0x65f6e7}));ring.rotation.x=Math.PI/2;ring.position.y=.4;g.add(ring);const beam=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,5,8),new THREE.MeshBasicMaterial({color:0x65f6e7,transparent:true,opacity:.45}));beam.position.y=2.5;g.add(beam);return g}
+function nearCar(){let best=null,bd=7;for(const c of cars){if(c.traffic&&c.stolen)continue;const d=Math.hypot(c.group.position.x-player.group.position.x,c.group.position.z-player.group.position.z);if(d<bd){bd=d;best=c}}return best}
+function enterCar(){if(activeCar){player.group.visible=true;player.x=activeCar.group.position.x+Math.cos(activeCar.group.rotation.y)*3;player.z=activeCar.group.position.z+Math.sin(activeCar.group.rotation.y)*3;player.group.position.set(player.x,0,player.z);activeCar=null;$('vehicleName').textContent='ПЕШКОМ';$('enterBtn').textContent='E · Угнать машину';sound(180,.13,'triangle');say('Ты вышел из машины');return}
+ const c=nearCar();if(!c){say('Подойди ближе к машине');return}activeCar=c;c.traffic=false;c.stolen=true;c.speed=Math.max(0,c.speed);player.group.visible=false;player.x=c.group.position.x;player.z=c.group.position.z;cash+=0;wanted=Math.min(5,wanted+1);$('vehicleName').textContent=c.spec.name;$('enterBtn').textContent='E · Выйти из машины';updateHud();sound(280,.18,'triangle');say('Угон! Розыск повышен. Машина под твоим контролем');if(!missionActive)startMission(0)}
+function startMission(i){missionActive=true;missionStage=i;const m=missions[i];$('missionTitle').textContent='КОНТРАКТ: '+m.name.toUpperCase();$('missionText').textContent=m.desc;$('missionAction').textContent='Отменить задание';missionTarget.position.set(i===0?100: i===1?-230:250,0,i===0?-110:i===1?240:-230);missionTarget.visible=true;say('Задание принято: '+m.name);sound(650,.2,'triangle')}
+function cancelMission(){missionActive=false;missionTarget.visible=false;$('missionTitle').textContent='СВОБОДНЫЙ РЕЖИМ';$('missionText').textContent='Исследуй город, угоняй машины и выполняй задания.';$('missionAction').textContent='Принять задание';}
+function completeMission(){const m=missions[missionStage];cash+=m.reward;missionDone++;say('Задание выполнено! +$'+m.reward);sound(880,.25,'sine');if(missionStage===0)startMission(1);else cancelMission();updateHud()}
+function updateHud(){$('cash').textContent='$ '+cash.toLocaleString('ru-RU');$('wanted').textContent=wanted?'РОЗЫСК: '+'★'.repeat(wanted):'';$('district').textContent=Math.abs(player.x)>240?'ПОРТ':Math.abs(player.z)>240?'СТАРЫЙ ГОРОД':Math.abs(player.x)<100&&Math.abs(player.z)<100?'ДЕЛОВОЙ ЦЕНТР':'НЕОН-СТРИТ'}
+function collideBuildings(x,z){for(const b of buildings)if(Math.abs(x-b.x)<b.w/2+1.4&&Math.abs(z-b.z)<b.d/2+1.4)return true;return false}
+function walk(dt){const forward=(keys.KeyW?1:0)-(keys.KeyS?1:0),turn=(keys.KeyD?1:0)-(keys.KeyA?1:0);player.angle-=turn*dt*2.7;if(forward){const sp=(keys.ShiftLeft||keys.ShiftRight)?10:5.2,nx=player.x+Math.sin(player.angle)*forward*sp*dt,nz=player.z+Math.cos(player.angle)*forward*sp*dt;if(!collideBuildings(nx,player.z))player.x=clamp(nx,-350,350);if(!collideBuildings(player.x,nz))player.z=clamp(nz,-350,350);player.walk+=dt*10;player.legs.forEach((l,i)=>l.rotation.x=Math.sin(player.walk+i*Math.PI)*.55);player.arms.forEach((a,i)=>a.rotation.x=Math.sin(player.walk+i*Math.PI)*.4)}player.group.position.set(player.x,0,player.z);player.group.rotation.y=player.angle}
+function drive(dt){const c=activeCar;if(!c)return;const throttle=(keys.KeyW?1:0)-(keys.KeyS?1:0),steer=(keys.KeyD?1:0)-(keys.KeyA?1:0),boost=(keys.ShiftLeft||keys.ShiftRight)?1.45:1,hand=keys.Space?.48:1;c.speed+=throttle*c.spec.accel*dt;c.speed*=Math.pow(.986,dt*60);c.speed=clamp(c.speed,-c.spec.speed*.35,c.spec.speed*boost);c.group.rotation.y-=steer*dt*(.9+Math.min(Math.abs(c.speed)/18,1.4))*Math.sign(c.speed||1)*hand;const nx=c.group.position.x+Math.sin(c.group.rotation.y)*c.speed*dt,nz=c.group.position.z+Math.cos(c.group.rotation.y)*c.speed*dt;if(!collideBuildings(nx,nz)){c.group.position.x=clamp(nx,-350,350);c.group.position.z=clamp(nz,-350,350)}else{c.speed*=-.22;sound(95,.08,'square',.04)}c.wheels.forEach(w=>w.rotation.x+=c.speed*dt*2);player.x=c.group.position.x;player.z=c.group.position.z;if(engineOsc&&engineGain&&audioCtx){engineOsc.frequency.setTargetAtTime(45+Math.abs(c.speed)*4,audioCtx.currentTime,.08);engineGain.gain.setTargetAtTime(.025+Math.min(.1,Math.abs(c.speed)/400),audioCtx.currentTime,.1)}}
+function updateTraffic(dt){for(const c of traffic){if(c===activeCar)continue;if(c.axis==='x'){c.group.position.x+=c.dir*c.speed*dt;c.group.position.z=c.lane;c.group.rotation.y=c.dir>0?Math.PI/2:-Math.PI/2;if(c.group.position.x>360)c.group.position.x=-360;if(c.group.position.x< -360)c.group.position.x=360}else{c.group.position.z+=c.dir*c.speed*dt;c.group.position.x=c.lane;c.group.rotation.y=c.dir>0?0:Math.PI;if(c.group.position.z>360)c.group.position.z=-360;if(c.group.position.z< -360)c.group.position.z=360}}
+ for(const n of npcs){if(n.isPlayer)continue;n.walk+=dt*n.speed;if(n.panic>0){n.panic-=dt;n.angle=Math.atan2(n.z-player.z,n.x-player.x)}else if(Math.random()<.006)n.angle+=rand(-1,1);const nx=n.x+Math.cos(n.angle)*n.speed*dt,nz=n.z+Math.sin(n.angle)*n.speed*dt;if(!collideBuildings(nx,nz)){n.x=clamp(nx,-345,345);n.z=clamp(nz,-345,345)}else n.angle+=Math.PI*.6;n.group.position.set(n.x,0,n.z);n.group.rotation.y=n.angle;n.legs.forEach((l,i)=>l.rotation.x=Math.sin(n.walk+i*Math.PI)*.35}}
 }
-function drawBuilding(b,camX,camY){const x=b.x-camX,y=b.y-camY;if(x+b.w<-100||y+b.h<-100||x>W+100||y>H+100)return;
- if(b.kind==='garage'){ctx.fillStyle='#1a2837';ctx.fillRect(x,y,b.w,b.h);ctx.strokeStyle='#65f6e7';ctx.lineWidth=3;ctx.strokeRect(x+4,y+4,b.w-8,b.h-8);ctx.fillStyle='#65f6e7';ctx.font='bold 12px system-ui';ctx.fillText('GARAGE',x+24,y+b.h/2);return}
- ctx.fillStyle='#0007';ctx.fillRect(x+8,y+10,b.w,b.h);ctx.fillStyle=b.color;ctx.fillRect(x,y,b.w,b.h);ctx.fillStyle='#ffffff12';ctx.fillRect(x,y,b.w,5);ctx.strokeStyle='#ffffff14';ctx.strokeRect(x,y,b.w,b.h);
- if(b.kind==='stadium'){ctx.strokeStyle='#7be8ef';ctx.lineWidth=5;ctx.strokeRect(x+25,y+25,b.w-50,b.h-50);ctx.fillStyle='#253c46';ctx.fillRect(x+65,y+60,b.w-130,b.h-120);ctx.fillStyle='#a7edbe';ctx.fillRect(x+80,y+75,b.w-160,b.h-150);ctx.fillStyle='#fff';ctx.font='bold 20px system-ui';ctx.fillText('NEON ARENA',x+130,y+30);return}
- if(b.kind==='warehouse'){ctx.fillStyle='#182b39';for(let i=0;i<7;i++){ctx.fillStyle=i%2?'#60707c':'#314958';ctx.fillRect(x+18+i*55,y+22,38,b.h-44)}return}
- for(const win of b.windows||[]){ctx.fillStyle=win.on?win.color+'bb':'#101c28';ctx.fillRect(win.x-camX,win.y-camY,5,8)}
+function updatePolice(dt){if(wanted<=0)return;policeTimer+=dt;if(policeTimer>3&&police.length<wanted){policeTimer=0;const c=makeCar(player.x+rand(-40,40),player.z+rand(-40,40),{name:'POLICE',price:0,color:0x172d4a,speed:30,accel:25},false);box(c.group,0,1.48,0,1.1,.18,.45,mat(0xefffff));const red=new THREE.PointLight(0xff224f,2,9);red.position.set(-.5,1.7,0);c.group.add(red);const blue=new THREE.PointLight(0x2288ff,2,9);blue.position.set(.5,1.7,0);c.group.add(blue);police.push(c);cars.push(c)}
+ for(const c of police){const dx=player.x-c.group.position.x,dz=player.z-c.group.position.z,d=Math.hypot(dx,dz);c.group.rotation.y=Math.atan2(dx,dz);c.speed=clamp(d*.25,8,25);c.group.position.x+=Math.sin(c.group.rotation.y)*c.speed*dt;c.group.position.z+=Math.cos(c.group.rotation.y)*c.speed*dt;if(d<5){if(activeCar)activeCar.speed*=.8;cash=Math.max(0,cash-20);say('Полиция прижала тебя! Штраф $20');wanted=Math.max(0,wanted-1);police.splice(police.indexOf(c),1);scene.remove(c.group);cars.splice(cars.indexOf(c),1);break}}
 }
-function drawCar(c,camX,camY){const x=c.x-camX,y=c.y-camY;if(x<-50||y<-50||x>W+50||y>H+50)return;ctx.save();ctx.translate(x,y);ctx.rotate(c.angle);ctx.fillStyle='#0008';ctx.fillRect(-17,-9,38,23);ctx.fillStyle=c.police?'#e8edf4':c.color;ctx.beginPath();ctx.roundRect(-20,-10,40,20,5);ctx.fill();ctx.fillStyle='#121c2b';ctx.beginPath();ctx.roundRect(-9,-8,18,16,4);ctx.fill();ctx.fillStyle='#d7f7ff';ctx.fillRect(12,-7,5,4);ctx.fillRect(12,3,5,4);ctx.fillStyle='#ff4f91';ctx.fillRect(-19,-7,3,4);ctx.fillRect(-19,3,3,4);if(c.police){ctx.fillStyle=frame%20<10?'#ff4b69':'#57e7ff';ctx.fillRect(-4,-10,8,3)}ctx.restore()}
-function drawPerson(p,camX,camY,isPlayer=false){
- const x=p.x-camX,y=p.y-camY;if(x<-40||y<-40||x>W+40||y>H+40)return;ctx.save();ctx.translate(x,y);
- if(isPlayer){
- ctx.shadowColor='#65f6e7';ctx.shadowBlur=22;ctx.strokeStyle='#65f6e7';ctx.lineWidth=2.5;ctx.beginPath();ctx.ellipse(0,7,14,8,0,0,Math.PI*2);ctx.stroke();
- ctx.fillStyle='#0009';ctx.beginPath();ctx.ellipse(0,9,10,5,0,0,Math.PI*2);ctx.fill();
- ctx.fillStyle='#182d42';ctx.beginPath();ctx.roundRect(-8,-5,16,18,5);ctx.fill();
- ctx.fillStyle='#65f6e7';ctx.beginPath();ctx.roundRect(-7,-4,14,13,4);ctx.fill();
- ctx.fillStyle='#e9ffff';ctx.beginPath();ctx.arc(0,-9,6.5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#142132';ctx.fillRect(-5,-12,10,3);
- ctx.strokeStyle='#e9ffff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(p.angle)*22,Math.sin(p.angle)*22);ctx.stroke();
- ctx.shadowBlur=0;ctx.fillStyle='#eaffff';ctx.font='900 10px system-ui';ctx.textAlign='center';ctx.fillText('ТЫ',0,-24);
- }else{
- ctx.fillStyle='#0008';ctx.beginPath();ctx.ellipse(0,4,5,3,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=p.color;ctx.beginPath();ctx.roundRect(-4,-2,8,10,3);ctx.fill();ctx.fillStyle='#e9d0b7';ctx.beginPath();ctx.arc(0,-5,3.5,0,Math.PI*2);ctx.fill();ctx.strokeStyle=p.color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-2,7);ctx.lineTo(-3,10);ctx.moveTo(2,7);ctx.lineTo(3,10);ctx.stroke();
- }
- ctx.restore()
+function update(dt){if(activeCar)drive(dt);else walk(dt);updateTraffic(dt);updatePolice(dt);if(missionActive&&Math.hypot(player.x-missionTarget.position.x,player.z-missionTarget.position.z)<9){if(missionStage===2&&wanted===0){completeMission()}else if(missionStage!==2)completeMission()}if(wanted>0&&Math.random()<dt*.012)wanted=Math.max(0,wanted-1);missionTarget.rotation.y+=dt*.7;missionTarget.children.forEach(ch=>{if(ch.geometry.type==='TorusGeometry')ch.rotation.z+=dt*.8});updateHud()}
+function draw(){const target=activeCar?activeCar.group.position:player.group.position;const yaw=activeCar?activeCar.group.rotation.y:player.angle;const dist=activeCar?12:9,height=activeCar?7:6;const desired=new THREE.Vector3(target.x-Math.sin(yaw)*dist,target.y+height,target.z-Math.cos(yaw)*dist);camera.position.lerp(desired,.12);camera.lookAt(target.x,target.y+1.2,target.z);renderer.render(scene,camera)}
+function loop(){if(!started)return;requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.04);if(!paused)update(dt);draw()}
+function showModal(id){paused=true;$(id).style.display='flex'}
+function hideModal(id){$(id).style.display='none';paused=false;clock.getDelta()}
+function renderGarage(){$('garageList').innerHTML='';carSpecs.forEach((s,i)=>{const row=document.createElement('div');row.className='garageitem';const label=document.createElement('div');label.innerHTML='<b>'+s.name+'</b><div class="small">'+(s.price?'Цена: $'+s.price:'Базовая модель')+'</div>';const btn=document.createElement('button');btn.textContent=s.price?'Купить':'Создать';btn.onclick=()=>{if(s.price>cash){say('Не хватает денег');return}cash-=s.price;const c=makeCar(player.x+rand(-6,6),player.z+rand(-6,6),s,false);cars.push(c);say('Автомобиль добавлен в гараж');updateHud();};row.append(label,btn);$('garageList').appendChild(row)})}
+function renderMissions(){$('missionList').innerHTML='';missions.forEach((m,i)=>{const row=document.createElement('div');row.className='garageitem';const label=document.createElement('div');label.innerHTML='<b>'+m.name+'</b><div class="small">'+m.desc+'</div><div class="small">Награда: $'+m.reward+'</div>';const btn=document.createElement('button');btn.textContent='Начать';btn.onclick=()=>{hideModal('missionModal');startMission(i)};row.append(label,btn);$('missionList').appendChild(row)})}
+function interact(){if(activeCar){enterCar();return}const c=nearCar();if(c){enterCar();return}if(missionActive){say('Продолжай активное задание');return}say('Подойди к автомобилю и нажми E, чтобы угнать его')}
+function horn(){audioInit();sound(230,.35,'square',.12);say('Би-и-ип!')}
+function fire(){audioInit();sound(120,.1,'sawtooth',.1);const x=player.x,z=player.z,a=player.angle;const g=new THREE.Mesh(new THREE.SphereGeometry(.13,8,8),new THREE.MeshBasicMaterial({color:0xffcb72}));g.position.set(x,1.4,z);scene.add(g);bullets.push({mesh:g,x,z,angle:a,life:1});npcs.forEach(n=>{if(Math.hypot(n.x-x,n.z-z)<7)n.panic=3});say('Выстрел!')}
+function bind(){
+ $('startBtn').addEventListener('click',()=>{audioInit();$('start').style.display='none';$('hud').style.display='block';started=true;clock.start();sound(350,.2,'triangle');say('Добро пожаловать в NEON CITY 3D');requestAnimationFrame(loop)});
+ $('enterBtn').onclick=interact;$('actionBtn').onclick=fire;$('hornBtn').onclick=horn;
+ $('garageBtn').onclick=()=>{renderGarage();showModal('garage')};$('closeGarage').onclick=()=>hideModal('garage');
+ $('missionBtn').onclick=()=>{renderMissions();showModal('missionModal')};$('closeMissions').onclick=()=>hideModal('missionModal');
+ $('missionAction').onclick=()=>missionActive?cancelMission():startMission(0);
+ $('pauseBtn').onclick=()=>{if(paused){hideModal('pauseModal')}else showModal('pauseModal')};$('resumeBtn').onclick=()=>hideModal('pauseModal');
+ $('mapBtn').onclick=()=>showModal('mapModal');$('closeMap').onclick=()=>hideModal('mapModal');
+ $('soundBtn').onclick=()=>{muted=!muted;$('soundBtn').textContent=muted?'♫ Звук: Выкл.':'♫ Звук: Вкл.';if(master)master.gain.value=muted?0:.2;if(!muted)audioInit();say(muted?'Звук выключен':'Звук включён')};
+ window.addEventListener('keydown',e=>{const code=e.code;if(['KeyW','KeyA','KeyS','KeyD','Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(code))e.preventDefault();keys[code]=true;if(e.repeat)return;if(code==='KeyE')interact();if(code==='KeyF')fire();if(code==='KeyH')horn();if(code==='Escape'){if($('pauseModal').style.display==='flex')hideModal('pauseModal');else showModal('pauseModal')}if(code==='KeyM')showModal('mapModal')});
+ window.addEventListener('keyup',e=>keys[e.code]=false);window.addEventListener('blur',()=>Object.keys(keys).forEach(k=>keys[k]=false));
+ document.querySelectorAll('[data-key]').forEach(btn=>{const k=btn.dataset.key;btn.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true;btn.setPointerCapture(e.pointerId)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>btn.addEventListener(ev,()=>keys[k]=false))});
+ window.addEventListener('resize',()=>{if(!renderer)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 }
-function drawWorld(){const follow=player.vehicle||player,camX=clamp(follow.x-W/2,0,WORLD.w-W),camY=clamp(follow.y-H/2,0,WORLD.h-H);drawRoads(camX,camY);
- // Parks, greenery and neon landmarks.
- for(const t of trees){const x=t.x-camX,y=t.y-camY;if(x<-100||y<-100||x>W+100||y>H+100)continue;if(t.park){ctx.fillStyle='#173b37';ctx.fillRect(x-110,y-100,220,200);ctx.strokeStyle='#3b8370';ctx.strokeRect(x-110,y-100,220,200)}else{ctx.fillStyle='#10251f';ctx.beginPath();ctx.arc(x,y,t.r+3,0,7);ctx.fill();ctx.fillStyle='#285d49';ctx.beginPath();ctx.arc(x,y,t.r,0,7);ctx.fill();ctx.fillStyle='#3f8b64';ctx.beginPath();ctx.arc(x-2,y-3,t.r*.55,0,7);ctx.fill()}}
- for(const b of buildings)drawBuilding(b,camX,camY);
- // Mission and garage beacons are always visible, with labels.
- const m=active();const marker=m.progress===1?m.target:m;if(m.progress!==2){const x=marker.x-camX,y=marker.y-camY;const pulse=18+Math.sin(frame*.09)*6;ctx.strokeStyle='#ffcf55';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,pulse,0,7);ctx.stroke();ctx.fillStyle='#ffcf55';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillText(m.progress===1?'ЦЕЛЬ':'ЗАДАНИЕ',x,y-28);ctx.textAlign='left'}
- const gx=garage.x-camX,gy=garage.y-camY;ctx.strokeStyle='#65f6e7';ctx.lineWidth=2;ctx.beginPath();ctx.arc(gx,gy,35+Math.sin(frame*.06)*4,0,7);ctx.stroke();
- for(const c of cars)drawCar(c,camX,camY);for(const n of npcs)drawPerson(n,camX,camY);for(const b of bullets){ctx.fillStyle='#ffdc77';ctx.beginPath();ctx.arc(b.x-camX,b.y-camY,3,0,7);ctx.fill()}
- if(player.vehicle)drawCar(player.vehicle,camX,camY);else drawPerson(player,camX,camY,true);
- // Cinematic edge shade.
- const grd=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.2,W/2,H/2,Math.max(W,H)*.72);grd.addColorStop(0,'#0000');grd.addColorStop(1,'#03060a99');ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
- drawMiniMap();
-}
-function drawMiniMap(){mctx.clearRect(0,0,300,300);mctx.fillStyle='#0b1420';mctx.fillRect(0,0,300,300);const scale=300/WORLD.w;mctx.fillStyle='#34424d';for(let x=0;x<WORLD.w;x+=WORLD.block)mctx.fillRect(x*scale,0,WORLD.road*scale,300);for(let y=0;y<WORLD.h;y+=WORLD.block)mctx.fillRect(0,y*scale,300,WORLD.road*scale);mctx.fillStyle='#65f6e7';mctx.beginPath();mctx.arc(player.x*scale,player.y*scale,5,0,7);mctx.fill();const m=active(),target=m.progress===1?m.target:m;if(m.progress!==2){mctx.fillStyle='#ffcf55';mctx.beginPath();mctx.arc(target.x*scale,target.y*scale,4,0,7);mctx.fill()}for(const c of cars)if(c.police){mctx.fillStyle='#ff4f91';mctx.fillRect(c.x*scale-2,c.y*scale-2,4,4)}}
-function loop(now){if(!started)return;requestAnimationFrame(loop);const dt=Math.min(.04,Math.max(0,(now-last)/1000));last=now;if(!paused)update(dt);if(audioCtx&&engineOsc&&engineGain){const speed=Math.abs(player.vehicle?.speed||0);engineOsc.frequency.setTargetAtTime(player.vehicle?55+speed*.32:42,audioCtx.currentTime,.08);engineGain.gain.setTargetAtTime(!paused&&player.vehicle?.speed?Math.min(.12,.018+speed/2600):0,audioCtx.currentTime,.12);ambienceGain.gain.setTargetAtTime(paused?.006:.018,audioCtx.currentTime,.25)}ctx.setTransform(DPR,0,0,DPR,0,0);drawWorld()}
+try{if(!window.THREE)throw new Error('Не загрузился Three.js. Проверь подключение к интернету и обнови страницу.');createWorld();bind();$('loadStatus').textContent='3D-город готов · WASD — управление';}catch(e){$('loadStatus').textContent='Ошибка запуска: '+e.message;say(e.message);console.error(e)}
 })();
 </script>
-</body>
-</html>
+</body></html>
