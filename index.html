@@ -207,8 +207,11 @@ function startFallbackGame(){
   if(status)status.textContent='Загрузка 3D-движка… ('+(index+1)+'/'+sources.length+')';
   const script=document.createElement('script');
   script.src=sources[index++];
-  script.onload=()=>{if(window.THREE)initGame();else attempt()};
-  script.onerror=attempt;
+  let settled=false;
+  const advance=()=>{if(settled)return;settled=true;attempt()};
+  const timeout=setTimeout(advance,6500);
+  script.onload=()=>{if(settled)return;settled=true;clearTimeout(timeout);if(window.THREE)initGame();else attempt()};
+  script.onerror=()=>{clearTimeout(timeout);advance()};
   document.head.appendChild(script);
  }
  attempt();
