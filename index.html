@@ -24,8 +24,8 @@
 <div class="modal" id="missionModal"><div class="box panel"><h2>Задания города</h2><div id="missionList"></div><button id="closeMissions" style="width:100%;margin-top:14px">Закрыть</button></div></div>
 <div class="modal" id="pauseModal"><div class="box panel"><h2>Пауза</h2><p>Игра приостановлена.</p><button id="resumeBtn" class="primary" style="width:100%">Продолжить</button></div></div>
 <div class="modal" id="mapModal"><div class="box panel"><h2>Районы города</h2><p>Центр — небоскрёбы и офисы.</p><p>Неон-стрит — клубы и яркие вывески.</p><p>Порт — склады и контейнеры.</p><p>Старый город — низкие здания и узкие кварталы.</p><button id="closeMap" style="width:100%;margin-top:14px">Закрыть</button></div></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
 <script>
+function initGame(){
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a);
@@ -95,7 +95,7 @@ function completeMission(){const m=missions[missionStage];cash+=m.reward;mission
 function updateHud(){$('cash').textContent='$ '+cash.toLocaleString('ru-RU');$('wanted').textContent=wanted?'РОЗЫСК: '+'★'.repeat(wanted):'';$('district').textContent=Math.abs(player.x)>240?'ПОРТ':Math.abs(player.z)>240?'СТАРЫЙ ГОРОД':Math.abs(player.x)<100&&Math.abs(player.z)<100?'ДЕЛОВОЙ ЦЕНТР':'НЕОН-СТРИТ'}
 function collideBuildings(x,z){for(const b of buildings)if(Math.abs(x-b.x)<b.w/2+1.4&&Math.abs(z-b.z)<b.d/2+1.4)return true;return false}
 function walk(dt){const forward=(keys.KeyW?1:0)-(keys.KeyS?1:0),turn=(keys.KeyD?1:0)-(keys.KeyA?1:0);player.angle-=turn*dt*2.7;if(forward){const sp=(keys.ShiftLeft||keys.ShiftRight)?10:5.2,nx=player.x+Math.sin(player.angle)*forward*sp*dt,nz=player.z+Math.cos(player.angle)*forward*sp*dt;if(!collideBuildings(nx,player.z))player.x=clamp(nx,-350,350);if(!collideBuildings(player.x,nz))player.z=clamp(nz,-350,350);player.walk+=dt*10;player.legs.forEach((l,i)=>l.rotation.x=Math.sin(player.walk+i*Math.PI)*.55);player.arms.forEach((a,i)=>a.rotation.x=Math.sin(player.walk+i*Math.PI)*.4)}player.group.position.set(player.x,0,player.z);player.group.rotation.y=player.angle}
-function drive(dt){const c=activeCar;if(!c)return;const throttle=(keys.KeyW?1:0)-(keys.KeyS?1:0),steer=(keys.KeyD?1:0)-(keys.KeyA?1:0),boost=(keys.ShiftLeft||keys.ShiftRight)?1.45:1,hand=keys.Space?.48:1;c.speed+=throttle*c.spec.accel*dt;c.speed*=Math.pow(.986,dt*60);c.speed=clamp(c.speed,-c.spec.speed*.35,c.spec.speed*boost);c.group.rotation.y-=steer*dt*(.9+Math.min(Math.abs(c.speed)/18,1.4))*Math.sign(c.speed||1)*hand;const nx=c.group.position.x+Math.sin(c.group.rotation.y)*c.speed*dt,nz=c.group.position.z+Math.cos(c.group.rotation.y)*c.speed*dt;if(!collideBuildings(nx,nz)){c.group.position.x=clamp(nx,-350,350);c.group.position.z=clamp(nz,-350,350)}else{c.speed*=-.22;sound(95,.08,'square',.04)}c.wheels.forEach(w=>w.rotation.x+=c.speed*dt*2);player.x=c.group.position.x;player.z=c.group.position.z;if(engineOsc&&engineGain&&audioCtx){engineOsc.frequency.setTargetAtTime(45+Math.abs(c.speed)*4,audioCtx.currentTime,.08);engineGain.gain.setTargetAtTime(.025+Math.min(.1,Math.abs(c.speed)/400),audioCtx.currentTime,.1)}}
+function drive(dt){const c=activeCar;if(!c)return;const throttle=(keys.KeyW?1:0)-(keys.KeyS?1:0),steer=(keys.KeyD?1:0)-(keys.KeyA?1:0),boost=(keys.ShiftLeft||keys.ShiftRight)?1.45:1,hand=keys.Space ? 0.48 : 1;c.speed+=throttle*c.spec.accel*dt;c.speed*=Math.pow(.986,dt*60);c.speed=clamp(c.speed,-c.spec.speed*.35,c.spec.speed*boost);c.group.rotation.y-=steer*dt*(.9+Math.min(Math.abs(c.speed)/18,1.4))*Math.sign(c.speed||1)*hand;const nx=c.group.position.x+Math.sin(c.group.rotation.y)*c.speed*dt,nz=c.group.position.z+Math.cos(c.group.rotation.y)*c.speed*dt;if(!collideBuildings(nx,nz)){c.group.position.x=clamp(nx,-350,350);c.group.position.z=clamp(nz,-350,350)}else{c.speed*=-.22;sound(95,.08,'square',.04)}c.wheels.forEach(w=>w.rotation.x+=c.speed*dt*2);player.x=c.group.position.x;player.z=c.group.position.z;if(engineOsc&&engineGain&&audioCtx){engineOsc.frequency.setTargetAtTime(45+Math.abs(c.speed)*4,audioCtx.currentTime,.08);engineGain.gain.setTargetAtTime(.025+Math.min(.1,Math.abs(c.speed)/400),audioCtx.currentTime,.1)}}
 function updateTraffic(dt){for(const c of traffic){if(c===activeCar)continue;if(c.axis==='x'){c.group.position.x+=c.dir*c.speed*dt;c.group.position.z=c.lane;c.group.rotation.y=c.dir>0?Math.PI/2:-Math.PI/2;if(c.group.position.x>360)c.group.position.x=-360;if(c.group.position.x< -360)c.group.position.x=360}else{c.group.position.z+=c.dir*c.speed*dt;c.group.position.x=c.lane;c.group.rotation.y=c.dir>0?0:Math.PI;if(c.group.position.z>360)c.group.position.z=-360;if(c.group.position.z< -360)c.group.position.z=360}}
  for(const n of npcs){if(n.isPlayer)continue;n.walk+=dt*n.speed;if(n.panic>0){n.panic-=dt;n.angle=Math.atan2(n.z-player.z,n.x-player.x)}else if(Math.random()<.006)n.angle+=rand(-1,1);const nx=n.x+Math.cos(n.angle)*n.speed*dt,nz=n.z+Math.sin(n.angle)*n.speed*dt;if(!collideBuildings(nx,nz)){n.x=clamp(nx,-345,345);n.z=clamp(nz,-345,345)}else n.angle+=Math.PI*.6;n.group.position.set(n.x,0,n.z);n.group.rotation.y=n.angle;n.legs.forEach((l,i)=>l.rotation.x=Math.sin(n.walk+i*Math.PI)*.35}}
 }
@@ -127,6 +127,32 @@ function bind(){
  window.addEventListener('resize',()=>{if(!renderer)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 }
 try{if(!window.THREE)throw new Error('Не загрузился Three.js. Проверь подключение к интернету и обнови страницу.');createWorld();bind();$('loadStatus').textContent='3D-город готов · WASD — управление';}catch(e){$('loadStatus').textContent='Ошибка запуска: '+e.message;say(e.message);console.error(e)}
+})();
+}
+(function loadThree(){
+ const status=document.getElementById('loadStatus');
+ const sources=[
+  'https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js',
+  'https://unpkg.com/three@0.160.0/build/three.min.js',
+  'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js'
+ ];
+ let index=0;
+ function attempt(){
+  if(window.THREE){initGame();return}
+  if(index>=sources.length){
+   if(status)status.textContent='Не удалось загрузить 3D-движок. Проверь интернет, отключи блокировщик CDN и нажми Ctrl+F5.';
+   const start=document.getElementById('start');
+   if(start)start.style.display='flex';
+   return;
+  }
+  if(status)status.textContent='Загрузка 3D-движка… ('+(index+1)+'/'+sources.length+')';
+  const script=document.createElement('script');
+  script.src=sources[index++];
+  script.onload=()=>{if(window.THREE)initGame();else attempt()};
+  script.onerror=attempt;
+  document.head.appendChild(script);
+ }
+ attempt();
 })();
 </script>
 </body></html>
