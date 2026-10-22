@@ -264,7 +264,6 @@ function handleKeyDown(e){
  if(!e.repeat&&k==='f'&&active&&battery>0){lightOn=!lightOn;setControlStatus(lightOn?'ФОНАРЬ ВКЛ':'ФОНАРЬ ВЫКЛ')}
 }
 function handleKeyUp(e){const k=String(e.key||'').toLowerCase(),action=actionForKey(k);if(action)delete keys[action]}
-window.addEventListener('keydown',handleKeyDown,{passive:false});
 document.addEventListener('keydown',handleKeyDown,{passive:false});
 window.addEventListener('keyup',handleKeyUp);
 document.addEventListener('keyup',handleKeyUp);
