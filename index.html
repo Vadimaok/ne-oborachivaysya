@@ -62,7 +62,7 @@ function districtAt(x,y){return districts.find(d=>x>=d.x&&x<d.x+d.w&&y>=d.y&&y<d
 function active(){return missions[activeMission%missions.length]}
 function notify(s){const el=$('toast');el.textContent=s;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2100)}
 function enterGame(){started=true;paused=false;$('start').style.display='none';$('hud').style.display='block';last=performance.now();notify('Добро пожаловать в NEON CITY');requestAnimationFrame(loop)}
-function startMission(m){activeMission=missions.indexOf(m);m.progress=0;missionProgress=0;notify('Контракт принят: '+m.title);if(m.type==='wanted'){player.wanted=Math.max(player.wanted,2);policeHeat=35}}
+function startMission(m){activeMission=missions.indexOf(m);m.progress=1;missionProgress=1;notify('Контракт принят: '+m.title);if(m.type==='wanted'){player.wanted=Math.max(player.wanted,2);policeHeat=35}}
 function openGarage(){garageOpen=true;$('garage').style.display='flex';paused=true}
 function closeGarage(){garageOpen=false;$('garage').style.display='none';paused=false;last=performance.now()}
 function buyCar(type){const spec=carTypes[type];if(!spec)return;if(player.cash<spec.price){notify('Не хватает денег');return}player.cash-=spec.price;player.vehicle=makeCar(player.x,player.y,type,false);player.vehicle.angle=player.angle;player.x=player.vehicle.x;player.y=player.vehicle.y;$('vehicleName').textContent=spec.name;closeGarage();notify(spec.name+' готов к заезду')}
@@ -90,7 +90,7 @@ function update(dt){
  const m=active(),p=player.vehicle||player;
  if(player.vehicle){
  const c=player.vehicle,spec=carTypes[c.type];const gas=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0),steer=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);
- const boost=keys.shift?1.65:1;const grip=keys[' ']?.45:1;
+ const boost=keys.shift?1.65:1;const grip=keys[' '] ? 0.45 : 1;
  c.speed+=gas*spec.acc*dt*(keys.shift?1.12:1);c.speed*=Math.max(0,1-dt*(gas?0.36:1.1));c.speed=clamp(c.speed,-spec.max*.42,spec.max*boost);
  c.angle+=steer*spec.turn*dt*clamp(Math.abs(c.speed)/65,.15,1)*Math.sign(c.speed||1)*grip;
  const nx=c.x+Math.cos(c.angle)*c.speed*dt,ny=c.y+Math.sin(c.angle)*c.speed*dt;
