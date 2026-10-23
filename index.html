@@ -53,35 +53,8 @@ function createPoliceInterior(){const x=policeInterior.x,z=policeInterior.z;box(
 function createJailInterior(){const x=jailInterior.x,z=jailInterior.z;box(scene,x,-.15,z,20,.3,18,mat(0x6c7479));for(const [xx,zz,w,d] of [[x,z-9,20,.3],[x,z+9,20,.3],[x-10,z,.3,18],[x+10,z,.3,18]])box(scene,xx,3.5,zz,w,7,d,mat(0x59636a));box(scene,x,7,z,20,.3,18,mat(0x303941));for(const dx of [-3,3])box(scene,x+dx,1,z-2,4,.6,6,mat(0x737a80));for(let xx=-4;xx<=4;xx+=1.2)box(scene,x+xx,1.6,z+8,.09,3,.12,mat(0x1b2229));const l=new THREE.PointLight(0xffd6a1,.7,18);l.position.set(x,4,z);scene.add(l)}
 function createRiverAndCoast(){const waterMat=new THREE.MeshStandardMaterial({color:0x07506d,roughness:.24,metalness:.12,transparent:true,opacity:.94});riverMesh=box(scene,240,-.1,0,60,.12,720,waterMat);box(scene,240,.02,0,28,.24,720,mat(0x626a70));for(let z=-360;z<=360;z+=120){box(scene,240,.04,z,60,.24,28,mat(0x626a70));for(const side of [-1,1]){box(scene,240+side*16,.8,z, .25,1.5,28,mat(0x7a8a90));if(z<300){box(scene,240+side*16,.8,z+70,.25,1.5,84,mat(0x7a8a90))}}}for(const z of [-240,0,240]){for(const x of [220,260])cylinder(scene,x,-2.1,z,.9,1.2,4.2,mat(0x626a70),8);for(const side of [-1,1]){box(scene,240+side*14,.97,z,.22,.18,26,mat(0xb5c1c4));for(let p=-10;p<=10;p+=5)box(scene,240+side*14,.98,z+p,.28,.08,.35,mat(0xdce4e5))}}box(scene,0,-.1,420,900,.12,120,waterMat);box(scene,0,-.1,-420,900,.12,120,waterMat);box(scene,-420,-.1,0,120,.12,900,waterMat);box(scene,420,-.1,0,120,.12,900,waterMat);box(scene,0,-.06,346,720,.16,16,mat(0xd4c19a));box(scene,0,-.06,-346,720,.16,16,mat(0xd4c19a));box(scene,-346,-.06,0,16,.16,720,mat(0xd4c19a));box(scene,346,-.06,0,16,.16,720,mat(0xd4c19a));for(let i=0;i<10;i++){const rock= new THREE.Mesh(new THREE.DodecahedronGeometry(rand(1,2.8),0),mat(0x6f7a7c));rock.position.set(rand(-320,320),-.05,rand(330,355));scene.add(rock)}const boundaryMat=new THREE.MeshBasicMaterial({visible:false});for(const [x,z,w,d] of [[0,442,900,2],[0,-442,900,2],[-442,0,2,900],[442,0,2,900]]){const wall=box(scene,x,6,z,w,12,d,boundaryMat);wall.userData.boundary=true}}
 function createCountry(){const dirt=mat(0x554b37),grass=mat(0x344a32),field=mat(0x52613a),treeTrunk=mat(0x55412e),leafMats=[mat(0x2c5d39),mat(0x376c40),mat(0x456f3a)];box(scene,0,-.53,0,900,.18,900,grass);for(const [x,z,w,d] of [[0,405,900,42],[0,-405,900,42],[405,0,42,900],[-405,0,42,900]])box(scene,x,-.4,z,w,.12,d,dirt);for(const [x,z,w,d] of [[-300,390,95,70],[280,390,110,70],[-390,230,65,100],[390,-250,70,110],[250,-390,100,65],[-230,-390,95,65]])box(scene,x,-.145,z,w,.012,d,field);for(let i=0;i<95;i++){const edge=i%4,along=rand(-425,425);let x,z;if(edge===0){x=along;z=rand(370,435)}else if(edge===1){x=along;z=rand(-435,-370)}else if(edge===2){x=rand(370,435);z=along}else{x=rand(-435,-370);z=along}if(Math.abs(x)>445||Math.abs(z)>445)continue;cylinder(scene,x,1.2,z,.25,.34,2.4,treeTrunk,8);const crown=new THREE.Mesh(new THREE.SphereGeometry(rand(2,4),9,7),leafMats[i%3]);crown.position.set(x,3.4,z);scene.add(crown);parkTrees.push({x,z,r:1.4})}for(const [x,z] of [[-300,390],[280,390],[390,-250]]){box(scene,x,3,z,14,6,12,mat(0x6a5946));box(scene,x,6.2,z,15,.5,13,mat(0x653b2e));for(const s of [-1,1])box(scene,x+s*4,1.4,z+6.1,2.4,2.8,.18,mat(0x342b25))}const countryRoad=mat(0x30363a,.98);for(const [x,z,w,d] of [[0,398,900,7],[398,0,7,900],[-398,0,7,900],[0,-398,900,7],[0,280,500,5],[0,-280,500,5],[280,0,5,500],[-280,0,5,500]]){box(scene,x,-.16,z,w,.12,d,countryRoad);if(w>d){for(let p=-430;p<430;p+=12)box(scene,p,-.085,z,5,.018,.12,new THREE.MeshBasicMaterial({color:0xd5cba7}))}else{for(let p=-430;p<430;p+=12)box(scene,x,-.085,p,.12,.018,5,new THREE.MeshBasicMaterial({color:0xd5cba7}))}}}
-function createRebuiltDistricts(){
- // A new visual identity: civic plaza, raised orbital interchange, tram corridor and port logistics yards.
- const concrete=mat(0x777f84,.9),darkAsphalt=mat(0x1b252d,.95),rail=mat(0x39454d,.55,.4),steel=mat(0x647783,.35,.55),glass=mat(0x5b9bb0,.22,.32);
- // Civic plaza: stepped concentric paving, fountains and a signature glass tower.
- box(scene,0,-.16,0,72,.22,72,mat(0x6a7478));
- for(let i=0;i<3;i++){const s=66-i*13;box(scene,0,-.02+i*.12,0,s,.08,s,mat([0x8c9696,0x68777d,0xa3a7a0][i]));}
- cylinder(scene,0,.32,0,8,8,.45,mat(0x4f6b76),32);cylinder(scene,0,.6,0,5.5,5.5,.2,mat(0x74c9d1),32);
- const water=new THREE.Mesh(new THREE.CircleGeometry(4.6,32),new THREE.MeshStandardMaterial({color:0x3fbed0,metalness:.25,roughness:.2,emissive:0x0a3444}));water.rotation.x=-Math.PI/2;water.position.set(0,.72,0);scene.add(water);
- // Distinctive high-rise crown and lit vertical fins.
- const tower=box(scene,0,33,0,17,65,17,mat(0x233847,.3,.22));box(scene,0,66,0,20,1,20,steel);box(scene,0,69,0,9,5,9,glass);buildings.push({x:0,z:0,w:17,d:17,h:65,mesh:tower});
- for(let side of [-1,1])for(let i=-3;i<=3;i++){const fin=box(scene,side*8.7,33,i*2.2,.18,62,.22,mat(0x66d8e6,.24,.35));}
- // Raised curved interchange ring with piers and guardrails.
- const ring=new THREE.Mesh(new THREE.TorusGeometry(82,5,5,100),darkAsphalt);ring.rotation.x=Math.PI/2;ring.position.y=4.4;scene.add(ring);
- const innerLine=new THREE.Mesh(new THREE.TorusGeometry(82,0.13,4,100),lanePaintForRebuild());innerLine.rotation.x=Math.PI/2;innerLine.position.y=4.48;scene.add(innerLine);
- for(let a=0;a<Math.PI*2;a+=Math.PI/10){const x=Math.cos(a)*82,z=Math.sin(a)*82;cylinder(scene,x,2.1,z,.65,.85,4.2,concrete,8);const railPost=box(scene,x,5.1,z,1.1,.8,1.1,steel)}
- // Long elevated bridge/expressway and rail corridor across the port-side district.
- for(let x=-320;x<340;x+=8){box(scene,x,2.8,-250,7.5,.22,16,darkAsphalt);box(scene,x,3.1,-258,.15,.42,.15,steel);box(scene,x,3.1,-242,.15,.42,.15,steel)}
- for(let x=-320;x<340;x+=24)cylinder(scene,x,1.35,-250,.38,.48,2.7,concrete,8);
- box(scene,0,.08,-280,660,.12,3.2,rail);box(scene,0,.08,-272,660,.12,3.2,rail);
- for(let x=-320;x<340;x+=6){box(scene,x,.17,-281,.12,.1,3.6,steel);box(scene,x,.17,-273,.12,.1,3.6,steel)}
- // New port terminal: gantry cranes, container stacks and loading aprons.
- box(scene,295,-.2,35,105,.28,190,concrete);
- for(let i=0;i<8;i++){const x=252+(i%4)*23,z=-35+Math.floor(i/4)*27;for(let j=0;j<3;j++)box(scene,x,1.3+j*2.5,z,19,2.4,10,mat([0x9c4854,0x3f7890,0xb28a46,0x47765b][(i+j)%4]));}
- for(const z of [-80,25,130]){box(scene,295,13,z,3,26,3,steel);box(scene,295,26,z,42,2,3,steel);box(scene,315,19,z,2,13,2,steel);box(scene,306,11,z,1,17,1,steel)}
- // Residential courtyard with low-rise blocks, courtyards and planted medians.
- for(const bx of [-220,-160])for(const bz of [100,170,240]){box(scene,bx,5,bz,25,10,24,mat(0x9a8b78));box(scene,bx,10.2,bz,27,.4,26,mat(0x403f3b));for(let q=-1;q<=1;q++){box(scene,bx+q*7,5,bz+12.2,2,2.4,.15,glass)}}
- for(let z=100;z<=250;z+=30){box(scene,-190,.02,z,4,.12,12,mat(0x3d6c4a));for(let side of [-1,1]){cylinder(scene,-190+side*5,1.2,z,.25,.3,2.4,mat(0x70533b),8);const crown=new THREE.Mesh(new THREE.SphereGeometry(1.8,8,7),mat(0x2e7650));crown.position.set(-190+side*5,2.8,z);scene.add(crown)}}
-}
-function lanePaintForRebuild(){return new THREE.MeshBasicMaterial({color:0xf3d783})}
+
+
 function createWorld(){
  scene=new THREE.Scene();scene.background=new THREE.Color(0x070d19);scene.fog=new THREE.FogExp2(0x070d19,.0019);
  camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,1200);
@@ -106,7 +79,7 @@ function createWorld(){
  for(let yy=4;yy<h-2;yy+=7)for(let zz=-d/2+4;zz<d/2-1;zz+=6){const w3=box(scene,x+w/2+.07,yy,z+zz,.12,1.4,1.5,wm);nightWindows.push(w3)}
  }
  }
- createCrimeDistrict();createPark();createPoliceStation();createCountry();createRiverAndCoast();createRebuiltDistricts();createHomeInterior();createHospitalInterior();
+ createCrimeDistrict();createPark();createPoliceStation();createCountry();createRiverAndCoast();createHomeInterior();createHospitalInterior();
  // Lamps along sidewalks
  for(let x=-300;x<=300;x+=120)for(let z=-300;z<=300;z+=120){cylinder(scene,x,2,z,.16,.22,4,mat(0x65717b));box(scene,x,4.1,z,.65,.2,.65,new THREE.MeshBasicMaterial({color:0x62f5e7}));if((Math.abs(x+z)/120)%2===0){const light=new THREE.PointLight(0xffd59a,0,19);light.position.set(x,4,z);scene.add(light);streetLights.push(light)}}
  // Decorative waterfront and containers
