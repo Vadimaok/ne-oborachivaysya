@@ -106,7 +106,39 @@ let mapDrawCounter=0;function drawMaps(){mapDrawCounter++;if(mapDrawCounter%5===
 function setRoute(x,z){routeTarget={x:clamp(x,-348,348),z:clamp(z,-348,348)};const snap=v=>Math.round(v/120)*120,sx=snap(player.x),sz=snap(player.z),tx=snap(routeTarget.x),tz=snap(routeTarget.z);routePoints=[{x:player.x,z:player.z},{x:sx,z:sz},{x:tx,z:sz},{x:tx,z:tz},{x:routeTarget.x,z:routeTarget.z}];if(routeLine)scene.remove(routeLine);routeLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints(routePoints.map(p=>new THREE.Vector3(p.x,.2,p.z))),new THREE.LineBasicMaterial({color:0x39f6ce}));scene.add(routeLine);missionTarget.position.set(routeTarget.x,0,routeTarget.z);missionTarget.visible=true;drawMaps();say('Маршрут проложен');}
 function clearRoute(){routeTarget=null;routePoints=[];if(routeLine){scene.remove(routeLine);routeLine=null}missionTarget.visible=missionActive;drawMaps();}
 let hospitalPoint={x:-220,z:262};
-function createTrafficInfrastructure(){for(const x of [-120,0,120])for(const z of [-120,0,120]){for(const side of [-1,1]){const px=x+side*17,pz=z+side*17;cylinder(scene,px,2.2,pz,.12,.16,4.4,mat(0x58636d));box(scene,px,4.35,pz,.65,1.45,.38,mat(0x141c26));const red=new THREE.Mesh(new THREE.SphereGeometry(.16,8,8),new THREE.MeshBasicMaterial({color:0xff2f51}));red.position.set(px,4.72,pz+.21);scene.add(red);const yellow=new THREE.Mesh(new THREE.SphereGeometry(.14,8,8),new THREE.MeshBasicMaterial({color:0xffc247}));yellow.position.set(px,4.35,pz+.21);scene.add(yellow);const green=new THREE.Mesh(new THREE.SphereGeometry(.16,8,8),new THREE.MeshBasicMaterial({color:0x3eff9b}));green.position.set(px,3.98,pz+.21);scene.add(green);signals.push({x,z,red,yellow,green,offset:(x+z+480)/30})}for(let q=-2;q<=2;q++){box(scene,x+q*2,-.035,z-21,1.15,.025,6,mat(0xe8edf0));box(scene,x+q*2,-.035,z+21,1.15,.025,6,mat(0xe8edf0));box(scene,x-21,-.035,z+q*2,6,.025,1.15,mat(0xe8edf0));box(scene,x+21,-.035,z+q*2,6,.025,1.15,mat(0xe8edf0))}}}
+function createTrafficInfrastructure(){
+ const poleMat=mat(0x58636d),signalBox=mat(0x141c26),cross=mat(0xf0f2ee),lanePaint=new THREE.MeshBasicMaterial({color:0xe6e9df}),stopPaint=new THREE.MeshBasicMaterial({color:0xf8f8f2});
+ // Signalized junctions, stop bars, zebra crossings, lane arrows and street furniture.
+ for(const x of [-240,-120,0,120,240])for(const z of [-240,-120,0,120,240]){
+  const intersection={x,z,offset:(x+z+720)/37};
+  for(const axis of ['x','z'])for(const side of [-1,1]){
+   const px=x+(axis==='z'?side*18:0),pz=z+(axis==='x'?side*18:0);
+   cylinder(scene,px,2.15,pz,.12,.16,4.3,poleMat,8);box(scene,px,4.3,pz,.62,1.45,.34,signalBox);
+   const red=new THREE.Mesh(new THREE.SphereGeometry(.15,8,8),new THREE.MeshBasicMaterial({color:0xff2f51}));red.position.set(px,4.7,pz+.19);scene.add(red);
+   const yellow=new THREE.Mesh(new THREE.SphereGeometry(.13,8,8),new THREE.MeshBasicMaterial({color:0xffc247}));yellow.position.set(px,4.3,pz+.19);scene.add(yellow);
+   const green=new THREE.Mesh(new THREE.SphereGeometry(.15,8,8),new THREE.MeshBasicMaterial({color:0x3eff9b}));green.position.set(px,3.92,pz+.19);scene.add(green);
+   signals.push({...intersection,axis,red,yellow,green,phaseOffset:side===1?0:9});
+  }
+  // Zebra crossings on all approaches and thick stop bars before them.
+  for(let q=-3;q<=3;q++){
+   box(scene,x+q*2,-.035,z-22,1.15,.025,6,cross);box(scene,x+q*2,-.035,z+22,1.15,.025,6,cross);
+   box(scene,x-22,-.035,z+q*2,6,.025,1.15,cross);box(scene,x+22,-.035,z+q*2,6,.025,1.15,cross);
+  }
+  for(const side of [-1,1]){
+   box(scene,x+side*13,-.028,z, .22,.03,20,stopPaint);box(scene,x,-.028,z+side*13,20,.03,.22,stopPaint);
+  }
+  // Rounded-corner visual islands make intersections read as junctions rather than tile seams.
+  for(const sx of [-1,1])for(const sz of [-1,1]){const island=new THREE.Mesh(new THREE.CircleGeometry(4.3,16),mat(0x343e3f));island.rotation.x=-Math.PI/2;island.position.set(x+sx*17,-.045,z+sz*17);scene.add(island)}
+ }
+ // Lane separators, broken center lines, reflectors and sidewalks continue between junctions.
+ for(let n=-3;n<=3;n++)for(let t=-350;t<350;t+=18){
+  for(const side of [-1,1]){
+   box(scene,t,-.045,n*120+side*4.2,7,.018,.12,lanePaint);
+   box(scene,n*120+side*4.2,-.045,t,.12,.018,7,lanePaint);
+  }
+  if(t%36===-0){box(scene,t,-.038,n*120-12,.3,.03,.3,mat(0xffcf6d));box(scene,n*120-12,-.038,t,.3,.03,.3,mat(0xffcf6d))}
+ }
+}
 function createHospital(){const x=-300,z=300;box(scene,x,5,z,34,10,25,mat(0xe4e8ed));box(scene,x,10.2,z,36,.6,27,mat(0x2e536b));box(scene,x,8,z-13,13,3,.5,mat(0xeff8ff));box(scene,x,8,z-13,3,3,.6,mat(0xd83349));box(scene,x,2,z+14,16,4,10,mat(0xeff8ff));box(scene,x+8,4.2,z+14,4,.4,1,mat(0xd83349));hospitalPoint={x:-300,z:322};buildings.push({x,z,w:34,d:25,h:10,mesh:null});}
 function nearCar(){let best=null,bd=7;for(const c of cars){if(c.traffic&&c.stolen)continue;const d=Math.hypot(c.group.position.x-player.group.position.x,c.group.position.z-player.group.position.z);if(d<bd){bd=d;best=c}}return best}
 function enterCar(){if(activeCar){player.group.visible=true;player.x=activeCar.group.position.x+Math.cos(activeCar.group.rotation.y)*3;player.z=activeCar.group.position.z+Math.sin(activeCar.group.rotation.y)*3;player.group.position.set(player.x,0,player.z);activeCar=null;$('vehicleName').textContent='ПЕШКОМ';$('enterBtn').textContent='E · Угнать машину';sound(180,.13,'triangle');say('Ты вышел из машины');return}
@@ -123,44 +155,78 @@ function walk(dt){const forward=(keys.KeyW?1:0)-(keys.KeyS?1:0),turn=(keys.KeyD?
 function drive(dt){const c=activeCar;if(!c)return;c.suspPhase+=dt*(5+Math.abs(c.speed)*.35);const throttle=(keys.KeyW?1:0)-(keys.KeyS?1:0),steer=(keys.KeyD?1:0)-(keys.KeyA?1:0),boost=(keys.ShiftLeft||keys.ShiftRight)?1.35:1,hand=keys.Space?.5:1;c.speed+=throttle*c.spec.accel*dt;c.speed*=Math.pow(.988,dt*60);c.speed=clamp(c.speed,-c.spec.speed*.4,c.spec.speed*boost);c.group.rotation.y-=steer*dt*(.7+Math.min(Math.abs(c.speed)/24,1.2))*Math.sign(c.speed||1)*hand;const nx=c.group.position.x+Math.sin(c.group.rotation.y)*c.speed*dt,nz=c.group.position.z+Math.cos(c.group.rotation.y)*c.speed*dt;if(!collideBuildings(nx,nz)&&!inCarCollision(nx,nz,c)){c.vx=Math.sin(c.group.rotation.y)*c.speed;c.vz=Math.cos(c.group.rotation.y)*c.speed;c.group.position.x=clamp(nx,-348,348);c.group.position.z=clamp(nz,-348,348)}else{c.speed*=-.24;sound(95,.08,'square',.05);if(Math.abs(c.speed)>15)health=Math.max(0,health-5)}c.wheels.forEach(w=>w.rotation.x+=c.speed*dt*2);c.group.position.y=c.baseY+Math.abs(c.speed)*.0015+Math.sin(c.suspPhase)*(.012+Math.min(.045,Math.abs(c.speed)*.001));c.group.rotation.z=clamp(-steer*.025*c.speed/12,-.12,.12)+Math.sin(c.suspPhase*.65)*.012;player.x=c.group.position.x;player.z=c.group.position.z;engineRev(c.speed)}
 function updateTraffic(dt){
  const now=performance.now()/1000;
- for(const s of signals){const p=(now+s.offset)%18;s.red.material.color.setHex(p<8?0xff2f51:0x3b2029);s.yellow.material.color.setHex(p>=8&&p<10?0xffc247:0x4b4329);s.green.material.color.setHex(p>=10?0x3eff9b:0x164b36)}
+ for(const s of signals){const phase=(now+s.offset+s.phaseOffset)%18;s.red.material.color.setHex(phase<8?0xff2f51:0x3b2029);s.yellow.material.color.setHex(phase>=8&&phase<10?0xffc247:0x4b4329);s.green.material.color.setHex(phase>=10?0x3eff9b:0x164b36)}
  for(const c of traffic){
   if(c===activeCar)continue;
   c.turnLock=Math.max(0,(c.turnLock||0)-dt);
-  let stop=false;
+  c.routeSpeed=c.routeSpeed||c.speed||12;
+  const pos=c.group.position,axis=c.axis,dir=c.dir||1,lane=c.lane;
+  // Traffic signals apply to the actual approach; yellow means stop unless already committed.
+  let stop=false,priority=false;
   for(const s of signals){
-   const phase=(now+s.offset)%18,red=phase<8;
-   const atX=Math.abs(c.group.position.x-s.x),atZ=Math.abs(c.group.position.z-s.z);
-   if(red&&((c.axis==='x'&&Math.abs(c.group.position.z-s.z)<8&&atX<19)||(c.axis==='z'&&Math.abs(c.group.position.x-s.x)<8&&atZ<19)))stop=true;
-  }
-  // Cars slow down when approaching another car in the same lane.
-  let gapSpeed=1;
-  for(const other of traffic){if(other===c||other.axis!==c.axis||Math.abs(other.lane-c.lane)>2)continue;const gap=c.axis==='x'?(other.group.position.x-c.group.position.x)*c.dir:(other.group.position.z-c.group.position.z)*c.dir;if(gap>0&&gap<13)gapSpeed=Math.min(gapSpeed,clamp((gap-4)/9,.12,1))}
-  const step=c.speed*(stop?0:gapSpeed)*dt;
-  if(c.axis==='x'){
-   c.group.position.x+=c.dir*step;c.group.position.z=c.lane;c.group.rotation.y=c.dir>0?Math.PI/2:-Math.PI/2;
-   if(c.turnLock<=0&&Math.abs(c.group.position.x/120-Math.round(c.group.position.x/120))<.025&&Math.abs(c.group.position.x)<330&&Math.random()<.025){
-    const junction=clamp(Math.round(c.group.position.x/120)*120,-240,240),offset=Math.random()<.5?-5:5;
-    c.group.position.x=junction;c.axis='z';c.lane=junction+offset;c.dir=Math.random()<.5?-1:1;c.group.position.x=c.lane;c.group.rotation.y=c.dir>0?0:Math.PI;c.turnLock=2.5;
+   const along=axis==='x'?(s.x-pos.x)*dir:(s.z-pos.z)*dir;
+   const cross=axis==='x'?Math.abs(pos.z-s.z):Math.abs(pos.x-s.x);
+   if(cross<7&&along>0&&along<22){
+    const phase=(now+s.offset+s.phaseOffset)%18,green=axis==='x'?phase>=10:phase<8;
+    if(!green&&along>7)stop=true;
+    if(along<14&&green)priority=true;
    }
-   if(c.group.position.x>360)c.group.position.x=-360;if(c.group.position.x< -360)c.group.position.x=360;
-  }else{
-   c.group.position.z+=c.dir*step;c.group.position.x=c.lane;c.group.rotation.y=c.dir>0?0:Math.PI;
-   if(c.turnLock<=0&&Math.abs(c.group.position.z/120-Math.round(c.group.position.z/120))<.025&&Math.abs(c.group.position.z)<330&&Math.random()<.025){
-    const junction=clamp(Math.round(c.group.position.z/120)*120,-240,240),offset=Math.random()<.5?-5:5;
-    c.group.position.z=junction;c.axis='x';c.lane=junction+offset;c.dir=Math.random()<.5?-1:1;c.group.position.z=c.lane;c.group.rotation.y=c.dir>0?Math.PI/2:-Math.PI/2;c.turnLock=2.5;
-   }
-   if(c.group.position.z>360)c.group.position.z=-360;if(c.group.position.z< -360)c.group.position.z=360;
   }
+  let gap=30;
+  for(const other of traffic){if(other===c||other.axis!==axis)continue;const sameLane=Math.abs((other.lane||0)-lane)<2.2;const along=axis==='x'?(other.group.position.x-pos.x)*dir:(other.group.position.z-pos.z)*dir;if(sameLane&&along>0)gap=Math.min(gap,along)}
+  // Attempt a deliberate lane change when following too closely, but only into a free lane.
+  if(gap<10&&c.changeCooldown<=0&&!stop){
+   const candidate=lane+(Math.random()<.5?-4.2:4.2);
+   if(Math.abs(candidate%120)>10){let free=true;for(const other of traffic){if(other===c||other.axis!==axis)continue;const same=axis==='x'?Math.abs(other.group.position.z-candidate):Math.abs(other.group.position.x-candidate);const ahead=axis==='x'?(other.group.position.x-pos.x)*dir:(other.group.position.z-pos.z)*dir;if(same<2.5&&Math.abs(ahead)<13)free=false}
+    if(free){c.targetLane=candidate;c.changeCooldown=4}
+   }
+  }
+  c.changeCooldown=Math.max(0,(c.changeCooldown||0)-dt);
+  if(c.targetLane!==undefined){const current=axis==='x'?pos.z:pos.x;const next=current+(c.targetLane-current)*Math.min(1,dt*1.2);if(Math.abs(next-c.targetLane)<.15){c.lane=c.targetLane;delete c.targetLane}else c.lane=next}
+  const targetSpeed=stop?0:gap<8?Math.max(0,(gap-3)*1.25):c.routeSpeed;
+  c.currentSpeed+=(targetSpeed-c.currentSpeed||0)*Math.min(1,dt*2.8);if(!Number.isFinite(c.currentSpeed))c.currentSpeed=targetSpeed;
+  const step=c.currentSpeed*dt;
+  // Smooth Bézier cornering at junctions. Each car commits to one turning path and keeps lane alignment.
+  if(c.turnCurve){
+   const tr=c.turnCurve;tr.t=Math.min(1,tr.t+dt/tr.duration);const t=tr.t,u=1-t;
+   pos.x=u*u*u*tr.p0.x+3*u*u*t*tr.p1.x+3*u*t*t*tr.p2.x+t*t*t*tr.p3.x;
+   pos.z=u*u*u*tr.p0.z+3*u*u*t*tr.p1.z+3*u*t*t*tr.p2.z+t*t*t*tr.p3.z;
+   const dx=3*u*u*(tr.p1.x-tr.p0.x)+6*u*t*(tr.p2.x-tr.p1.x)+3*t*t*(tr.p3.x-tr.p2.x);
+   const dz=3*u*u*(tr.p1.z-tr.p0.z)+6*u*t*(tr.p2.z-tr.p1.z)+3*t*t*(tr.p3.z-tr.p2.z);
+   c.group.rotation.y=Math.atan2(dx,dz);if(t>=1){c.axis=tr.axis;c.dir=tr.dir;c.lane=tr.lane;delete c.turnCurve}
+   continue;
+  }
+  if(axis==='x'){pos.x+=dir*step;pos.z=c.lane;c.group.rotation.y=dir>0?Math.PI/2:-Math.PI/2}
+  else{pos.z+=dir*step;pos.x=c.lane;c.group.rotation.y=dir>0?0:Math.PI}
+  const along=axis==='x'?pos.x:pos.z,nearest=Math.round(along/120)*120,atJunction=Math.abs(along-nearest)<Math.max(1.2,step*1.4)&&Math.abs(nearest)<=240&&Math.abs((axis==='x'?pos.z:pos.x)-c.lane)<2.5;
+  if(atJunction&&c.turnLock<=0&&!stop&&Math.random()<.28){
+   const turn=Math.random()<.34?'straight':Math.random()<.5?'left':'right';
+   if(turn!=='straight'){
+    const sign=turn==='left'?-1:1,j=nearest,oldAxis=axis,oldDir=dir,offset=(Math.abs(lane%120)>0?Math.sign(lane%120):oldDir)*4.2;
+    let endAxis=oldAxis==='x'?'z':'x',newDir=oldAxis==='x'?(turn==='left'?-oldDir:oldDir):(turn==='left'?oldDir:-oldDir);
+    const p0={x:pos.x,z:pos.z},p3=oldAxis==='x'?{x:j+offset,z:pos.z+newDir*4.2}:{x:pos.x+newDir*4.2,z:j+offset};
+    if(oldAxis==='x')p3={x:j+newDir*4.2,z:pos.z+offset};else p3={x:pos.x+offset,z:j+newDir*4.2};
+    const distance=10, p1={x:p0.x+(oldAxis==='x'?oldDir*distance:0),z:p0.z+(oldAxis==='z'?oldDir*distance:0)},p2={x:p3.x-(endAxis==='x'?newDir*distance:0),z:p3.z-(endAxis==='z'?newDir*distance:0)};
+    c.turnCurve={p0,p1,p2,p3,axis:endAxis,dir:newDir,lane:endAxis==='x'?p3.z:p3.x,t:0,duration:.85};c.turnLock=2.6;continue;
+   }else c.turnLock=1.8;
+  }
+  if(axis==='x'){if(pos.x>355)pos.x=-355;if(pos.x< -355)pos.x=355}else{if(pos.z>355)pos.z=-355;if(pos.z< -355)pos.z=355}
  }
+ // Pedestrians use marked crossings; they wait for conflicting traffic and cross perpendicular to the road.
  for(const n of npcs){
   if(n.isPlayer||n.parkWalker)continue;
   if(n.knocked){n.fall-=dt;n.x+=n.vx*dt;n.z+=n.vz*dt;n.vx*=Math.pow(.08,dt);n.vz*=Math.pow(.08,dt);n.group.position.set(n.x,0,n.z);n.group.rotation.z=Math.min(1.35,(1.5-Math.max(0,n.fall))*1.2);n.legs.forEach((l,i)=>l.rotation.x=(i?1:-1)*.8);n.arms.forEach((a,i)=>a.rotation.z=(i?1:-1)*1.1);if(n.fall<=0){n.knocked=false;n.panic=0;n.speed=1.4;n.group.rotation.z=0;n.legs.forEach(l=>l.rotation.x=0);n.arms.forEach(a=>a.rotation.z=0)}continue}
   n.walk+=dt*n.speed;let threat=null,threatD=Infinity;
   for(const car of cars){const dx=n.x-car.group.position.x,dz=n.z-car.group.position.z,d=Math.hypot(dx,dz);if(d<7&&d<threatD){threat=car;threatD=d}}
-  if(threat&&threatD<4.5){n.panic=Math.max(n.panic,.9);n.angle=Math.atan2(n.z-threat.group.position.z,n.x-threat.group.position.x);n.speed=2.8}else if(n.panic<=0)n.speed=1.65;
-  const nearRoad=Math.abs(n.x%120)<14||Math.abs(n.z%120)<14;
-  if(nearRoad&&n.panic<=0){const nx=Math.round(n.x/120)*120,nz=Math.round(n.z/120)*120;if(Math.abs(n.x-nx)>12)n.angle=n.x>nx?Math.PI:0;else if(Math.abs(n.z-nz)>12)n.angle=n.z>nz?-Math.PI/2:Math.PI/2;else{const sig=signals.find(s=>Math.abs(s.x-nx)<5&&Math.abs(s.z-nz)<5);if(sig&&((now+sig.offset)%18)<8)n.speed=.05;else n.speed=1.5}}
+  if(threat&&threatD<4.5){n.panic=Math.max(n.panic,.9);n.angle=Math.atan2(n.z-threat.group.position.z,n.x-threat.group.position.x);n.speed=2.8}else if(n.panic<=0)n.speed=1.35;
+  const nearX=Math.abs(n.x/120-Math.round(n.x/120))*120<12,nearZ=Math.abs(n.z/120-Math.round(n.z/120))*120<12;
+  if(n.panic<=0&&(nearX||nearZ)){
+   const ix=Math.round(n.x/120)*120,iz=Math.round(n.z/120)*120;
+   const roadCrossing=nearX&&Math.abs(n.z-iz)<10||nearZ&&Math.abs(n.x-ix)<10;
+   if(roadCrossing){let carNear=false;for(const car of traffic)if(Math.hypot(car.group.position.x-n.x,car.group.position.z-n.z)<13)carNear=true;
+    if(carNear)n.speed=.05;else{n.speed=1.2;if(nearX)n.angle=n.x<ix?0:Math.PI;else n.angle=n.z<iz?Math.PI/2:-Math.PI/2}
+   }
+  }
   if(n.panic>0){n.panic-=dt;if(player&&Math.hypot(n.x-player.x,n.z-player.z)>14)n.angle=Math.atan2(n.z-player.z,n.x-player.x)}else if(Math.random()<.006)n.angle+=rand(-1,1);
   const nx=n.x+Math.cos(n.angle)*n.speed*dt,nz=n.z+Math.sin(n.angle)*n.speed*dt;
   if(!collideBuildings(nx,nz)&&!inCarCollision(nx,nz,null)){n.x=clamp(nx,-345,345);n.z=clamp(nz,-345,345)}else{n.angle+=Math.PI*(.45+Math.random()*.2);n.panic=Math.max(n.panic,.35)}
